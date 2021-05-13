@@ -14,10 +14,12 @@ add_library(lotus_a STATIC
     ${LIBLOTUS_INCLUDE_FILES} # for the convienece of searching in IDE
 )
 
-set_target_properties(lotus_a PROPERTIES LINKER_LANGUAGE CXX)
-
 target_include_directories(lotus_a PRIVATE
     "inc"
+)
+
+target_link_libraries(lotus_a
+    PRIVATE uvw::uvw
 )
 
 message(STATUS "make liblotus - done")

@@ -6,7 +6,9 @@ add_executable(democlient
 )
 
 target_include_directories(democlient PRIVATE ${LIBLOTUS_INCLUDE})
-target_link_libraries(democlient lotus_a)
+target_link_libraries(democlient
+    PRIVATE lotus_a
+)
 
 message(STATUS "make demo-client - done")
 

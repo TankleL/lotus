@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 message(STATUS "making project lotus ...")
 
+# project freeisa
+project(lotus)
+
 # run premake.cmake
 message(STATUS "running premake.cmake ...")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/premake.cmake)
 message(STATUS "run premake.cmake - done")
-
-# project freeisa
-project(lotus)
 
 # normalize useful directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
