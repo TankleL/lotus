@@ -6,6 +6,9 @@ class Session
 public:
     Session();
 
+public:
+    void send_msg();
+
 private:
     int _placeholder;
 };

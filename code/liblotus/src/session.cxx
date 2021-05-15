@@ -1,4 +1,3 @@
-#include <uvw.hpp>
 #include "session.hxx"
 
 Session::Session()

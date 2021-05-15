@@ -2,11 +2,18 @@ cmake_minimum_required(VERSION 3.10)
 message(STATUS "making liblotus ...")
 
 set(LIBLOTUS_INCLUDE_FILES
+    inc/conn.hxx
+    inc/msg.hxx
     inc/session.hxx
+    inc/staloop.hxx
+    inc/uuid.hxx
 )
 
 set(LIBLOTUS_SOURCE_FILES
+    src/msg.cxx
     src/session.cxx
+    src/staloop.cxx
+    src/uuid.cxx
 )
 
 add_library(lotus_a STATIC
