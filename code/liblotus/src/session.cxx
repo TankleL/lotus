@@ -1,5 +1,12 @@
 #include "session.hxx"
 
-Session::Session()
-    : _placeholder(0)
-{}
+namespace lotus::core
+{
+    Session::Session(std::weak_ptr<IConnection> conn)
+        : _conn(conn)
+    {}
+
+    void Session::send_msg()
+    {}
+}
+

@@ -1,9 +1,15 @@
 #ifndef LOTUS_MSG_H
 #define LOTUS_MSG_H
 
-#include "uuid.hxx"
 #include <string>
 #include <cstdint>
+#include "uuid.hxx"
+
+/*
+ * NOTE: This is a bad designed message class
+ * We will change this file entirely once we finished
+ * fundamental works
+*/
 
 namespace lotus::core
 {
