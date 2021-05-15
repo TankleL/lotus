@@ -4,11 +4,11 @@ int main(int argc, char** argv)
 {
     using namespace lotus::core;
 
-    auto loop = std::make_shared<STALoop>();
+    auto loop = std::shared_ptr<STALoop>(STALoop::create());
     auto conn =
         std::make_shared<connection::TCPClientSideConnection>(loop);
 
-    conn->connect("host=tcp://127.0.0.1; port=50500", []() {});
+    conn->connect("host=127.0.0.1; port=50500", []() {});
 
     Session session(conn);
     session.send_msg();

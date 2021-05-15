@@ -11,25 +11,23 @@
 
 namespace lotus::core
 {
-    namespace _internal_impl
-    {
-        struct ISTALoopInternalProps
-        {
-            virtual ~ISTALoopInternalProps() noexcept {}
-        };
-    }
-
     class STALoop
     {
-    public:
+    protected:
         STALoop() noexcept;
 
-    public:
-        void run();
-
     private:
-        std::unique_ptr<_internal_impl::ISTALoopInternalProps>
-            _props;
+        STALoop(std::unique_ptr<STALoop>&& impl) noexcept;
+
+    public:
+        static STALoop* create() noexcept;
+        virtual ~STALoop() noexcept;
+
+    public:
+        virtual void run() noexcept;
+
+    public:
+        std::unique_ptr<STALoop>  _impl;
     };
 }
 

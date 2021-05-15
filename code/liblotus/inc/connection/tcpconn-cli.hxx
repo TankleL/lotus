@@ -26,6 +26,8 @@ namespace lotus::core::connection
 
     private:
         std::weak_ptr<STALoop> _loop;
+        std::weak_ptr<void> _tcp_handle;
+        bool _is_connected;
     };
 } // namespace lotus::core::connection
 

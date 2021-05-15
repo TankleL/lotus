@@ -1,33 +1,27 @@
+#include "staloop-intl.hxx"
 #include "staloop.hxx"
-#include <uvw.hpp>
 
 namespace lotus::core
 {
-    namespace _internal_impl
-    {
-        struct STALoopIntlProps : public ISTALoopInternalProps
-        {
-            STALoopIntlProps() noexcept
-                : loop(uvw::Loop::create())
-            {}
-
-            ~STALoopIntlProps() noexcept override
-            {}
-
-            std::shared_ptr<uvw::Loop> loop;
-        };
-    }
-
-#define PROPS  \
-(static_cast<_internal_impl::STALoopIntlProps*>(this->_props.get()))
-
     STALoop::STALoop() noexcept
-        : _props(new _internal_impl::STALoopIntlProps())
     {}
 
-    void STALoop::run()
+    STALoop::STALoop(std::unique_ptr<STALoop>&& impl) noexcept
+        : _impl(std::move(impl))
+    {}
+
+    STALoop::~STALoop() noexcept
+    {}
+
+    STALoop* STALoop::create() noexcept
     {
-        PROPS->loop->run();
+        auto impl = std::make_unique<_internal::STALoopImpl>();
+        return new STALoop(std::move(impl));
+    }
+
+    void STALoop::run() noexcept
+    {
+        _impl->run();
     }
     
 } // namespace lotus::core
