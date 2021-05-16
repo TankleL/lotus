@@ -24,6 +24,6 @@ set(LIBLOTUS_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/liblotus/inc")
 # sub directories
 add_subdirectory(liblotus)
 add_subdirectory(demo-client)
-#add_subdirectory(demo-server)
+add_subdirectory(demo-server)
 
 message(STATUS "make project lotus - done")

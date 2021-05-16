@@ -20,6 +20,7 @@ set(LIBLOTUS_INCLUDE_INTERNAL_FILES
 
 set(LIBLOTUS_SOURCE_FILES
     src/connection/tcpconn-cli.cxx
+    src/connection/tcpconn-svr.cxx
     src/connstr.cxx
     src/msg.cxx
     src/session.cxx
