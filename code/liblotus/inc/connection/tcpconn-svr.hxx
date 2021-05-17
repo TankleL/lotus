@@ -8,7 +8,11 @@
 
 namespace lotus::core::connection
 {
+    // forward declaration ------------------------------------------
     class TCPServerSideConnection;
+
+    // TCPConnectionListener ----------------------------------------
+
     class TCPConnectionListener
     {
     public:
@@ -26,6 +30,8 @@ namespace lotus::core::connection
     private:
         std::weak_ptr<STALoop> _loop;
     };
+    
+    // TCPServerSideConnection  -------------------------------------
 
     class TCPServerSideConnection final :
         public IServerSideConnection
@@ -34,14 +40,25 @@ namespace lotus::core::connection
         TCPServerSideConnection() noexcept;
 
     public:
-        typedef std::function<void(const char* data, size_t len)>
+        static constexpr int AttIdx_SessionListener = 1;
+
+    public:
+        typedef std::function<
+            bool(
+                TCPServerSideConnection& conn,
+                const char* data,
+                size_t len)>
             data_received_callback_t;
         data_received_callback_t on_data_received;
 
     public:
+        ~TCPServerSideConnection();
+
         void write() override {}
         void read() override;
         void on_error() override {}
+
+        void close() noexcept;
 
     public:
         static std::shared_ptr<TCPServerSideConnection>

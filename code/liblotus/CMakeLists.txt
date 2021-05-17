@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 message(STATUS "making liblotus ...")
 
 set(LIBLOTUS_INCLUDE_FILES
+    inc/attachable.hxx
     inc/conn.hxx
     inc/connection/httpconn-cli.hxx
     inc/connection/httpconn-svr.hxx
@@ -9,6 +10,7 @@ set(LIBLOTUS_INCLUDE_FILES
     inc/connection/tcpconn-svr.hxx
     inc/msg.hxx
     inc/session.hxx
+    inc/session-lstnr.hxx
     inc/staloop.hxx
     inc/uuid.hxx
 )
@@ -19,11 +21,13 @@ set(LIBLOTUS_INCLUDE_INTERNAL_FILES
 )
 
 set(LIBLOTUS_SOURCE_FILES
+    src/attachable.cxx
     src/connection/tcpconn-cli.cxx
     src/connection/tcpconn-svr.cxx
     src/connstr.cxx
     src/msg.cxx
     src/session.cxx
+    src/session-lstnr.cxx
     src/staloop.cxx
     src/staloop-intl.cxx
     src/uuid.cxx

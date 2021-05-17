@@ -3,13 +3,14 @@
 
 #include <functional>
 #include <string>
+#include "attachable.hxx"
 
 namespace lotus::core
 {
     class IConnection
     {
     public:
-        ~IConnection() {}
+        virtual ~IConnection() {}
 
     public:
         virtual void write() = 0;
@@ -17,10 +18,12 @@ namespace lotus::core
         virtual void on_error() = 0;
     };
 
-    class IClientSideConnection : public IConnection
+    class IClientSideConnection :
+        public IConnection,
+        public Attachable
     {
     public:
-        ~IClientSideConnection() {}
+        virtual ~IClientSideConnection() {}
 
     public:
         typedef std::function<void()> connect_callback_t;
@@ -32,10 +35,12 @@ namespace lotus::core
         virtual void disconnect() noexcept = 0;
     };
 
-    class IServerSideConnection : public IConnection
+    class IServerSideConnection :
+        public IConnection,
+        public Attachable
     {
     public:
-        ~IServerSideConnection() {}
+        virtual ~IServerSideConnection() {}
     };
     
 } // namespace lotus::core

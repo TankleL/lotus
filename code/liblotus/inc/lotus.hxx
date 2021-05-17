@@ -6,4 +6,5 @@
 #include "msg.hxx"
 #include "staloop.hxx"
 #include "session.hxx"
+#include "session-lstnr.hxx"
 #include "uuid.hxx"
