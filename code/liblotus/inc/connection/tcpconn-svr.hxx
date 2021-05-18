@@ -40,18 +40,6 @@ namespace lotus::core::connection
         TCPServerSideConnection() noexcept;
 
     public:
-        static constexpr int AttIdx_SessionListener = 1;
-
-    public:
-        typedef std::function<
-            bool(
-                TCPServerSideConnection& conn,
-                const char* data,
-                size_t len)>
-            data_received_callback_t;
-        data_received_callback_t on_data_received;
-
-    public:
         ~TCPServerSideConnection();
 
         void write() override {}

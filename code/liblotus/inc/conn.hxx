@@ -40,6 +40,18 @@ namespace lotus::core
         public Attachable
     {
     public:
+        // reserved attachment id list
+        static constexpr int ATTID_SessionListener = 0;
+
+    public:
+        typedef std::function<
+            bool(
+                IServerSideConnection& conn,
+                const char* data,
+                size_t len)>
+            data_received_callback_t;
+        data_received_callback_t on_data_received;
+    public:
         virtual ~IServerSideConnection() {}
     };
     
