@@ -47,6 +47,7 @@ target_include_directories(lotus_a PRIVATE
 
 target_link_libraries(lotus_a
     PRIVATE uvw::uvw
+    PRIVATE dl
 )
 
 message(STATUS "make liblotus - done")
