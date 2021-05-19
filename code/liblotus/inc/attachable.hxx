@@ -20,27 +20,27 @@ namespace lotus::core
         void attach(
             int index,
             std::unique_ptr<IAttachment>&& attachment) noexcept;
-        std::optional<IAttachment&> attachment(int index) noexcept;
+        IAttachment* attachment(int index) noexcept;
         void detach(int index) noexcept;
         void clear() noexcept;
 
     public:
         template<typename ValType>
-        constexpr std::optional<ValType&> att(int index) noexcept
+        constexpr ValType* attachment(int index) noexcept
         {
-            const auto& att = attachment(index);
-            if (att.has_value())
+            IAttachment* att = attachment(index);
+            if (att != nullptr)
             {
-                return std::make_optional<ValType&>(att.value());
+                return static_cast<ValType*>(att);
             }
             else
             {
-                return std::optional<ValType&>();
+                return nullptr;
             }
         }
 
     private:
-        std::map<int, std::unique_ptr<std::any>> _attachments;
+        std::map<int, std::unique_ptr<IAttachment>> _attachments;
     };
 }
 

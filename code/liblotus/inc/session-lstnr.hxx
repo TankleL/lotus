@@ -10,7 +10,7 @@
 
 namespace lotus::core
 {
-    class SessionListener : IAttachment
+    class SessionListener : public IAttachment
     {
     public:
         typedef std::function<void(const char*, size_t)>

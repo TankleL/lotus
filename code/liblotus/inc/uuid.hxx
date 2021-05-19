@@ -39,7 +39,7 @@ namespace lotus::core
         data_t _data;
 
     private:
-        static std::default_random_engine* _rendeng;
+        static std::mt19937* _rendeng;
         static std::uniform_int_distribution<int> _renddis;
     };
 

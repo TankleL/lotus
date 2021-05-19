@@ -27,12 +27,13 @@ namespace lotus::core
             size_t len) -> bool
         {
             auto listener =
-                conn.att<SessionListener>(conn.ATTID_SessionListener);
-            assert(listener.has_value());
-            return listener.value()->eat(data, len);
+                conn.attachment<SessionListener>(
+                    conn.ATTID_SessionListener);
+            assert(listener != nullptr);
+            return listener->eat(data, len);
         };
 
-        return listener;
+        return *instance;
     }
 }
 

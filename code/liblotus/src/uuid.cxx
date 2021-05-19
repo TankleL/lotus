@@ -5,7 +5,7 @@
 
 namespace lotus::core
 {
-    std::default_random_engine* UUID::_rendeng = nullptr;
+    std::mt19937* UUID::_rendeng = nullptr;
     std::uniform_int_distribution<int> UUID::_renddis(0, 127);
 
     UUID::UUID()
@@ -40,7 +40,7 @@ namespace lotus::core
 
         if (_rendeng == nullptr)
         {
-            _rendeng = new std::default_random_engine(std::mt19937((unsigned int)std::time(0)));
+            _rendeng = new std::mt19937((unsigned int)std::time(0));
         }
 
         std::array<uint8_t, 16> data;
