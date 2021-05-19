@@ -4,7 +4,7 @@
 set(LOTUSES_VCPKG_TRIPLET_DEFAULT "x64-windows-static")
 if(UNIX AND NOT APPLE)
     # for Linux, BSD, Solaris, Minix
-    set(LOTUSES_VCPKG_TRIPLET_DEFAULT "x64-linux-static")
+    set(LOTUSES_VCPKG_TRIPLET_DEFAULT "x64-linux")
 endif()
 
 # require LOTUSES_VCPKG_ROOT
