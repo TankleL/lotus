@@ -6,6 +6,9 @@ namespace lotus::core
     SessionListener::SessionListener() noexcept
     {}
 
+    SessionListener::~SessionListener() noexcept
+    {}
+
     bool SessionListener::eat(
         const char* data,
         size_t length) noexcept
@@ -16,9 +19,7 @@ namespace lotus::core
     SessionListener& SessionListener::bind(
         IServerSideConnection& conn) noexcept
     {
-        auto instance = std::make_unique<std::any>(
-            std::make_any<SessionListener>());
-        auto& listener = std::any_cast<SessionListener>(*instance);
+        auto instance = std::make_unique<SessionListener>();
         conn.attach(conn.ATTID_SessionListener, std::move(instance));
         conn.on_data_received = []
         (IServerSideConnection& conn,

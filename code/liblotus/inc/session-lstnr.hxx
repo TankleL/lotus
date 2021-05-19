@@ -4,11 +4,13 @@
 #include <functional>
 #include <memory>
 #include <session.hxx>
+
+#include "attachable.hxx"
 #include "conn.hxx"
 
 namespace lotus::core
 {
-    class SessionListener
+    class SessionListener : IAttachment
     {
     public:
         typedef std::function<void(const char*, size_t)>
@@ -19,6 +21,7 @@ namespace lotus::core
 
     public:
         SessionListener() noexcept;
+        virtual ~SessionListener() noexcept;
 
     public:
         static SessionListener& bind(
