@@ -33,6 +33,11 @@ set(LIBLOTUS_SOURCE_FILES
     src/uuid.cxx
 )
 
+set(LIBLOTUS_PROTOCOL_FILES
+    protocols/proto-session-lstnr.cxx
+    protocols/proto-session-lstnr.hxx
+)
+
 add_library(lotus_a STATIC
     ${LIBLOTUS_SOURCE_FILES}
     ${LIBLOTUS_INCLUDE_FILES} # for the convienece of searching in IDE
@@ -48,6 +53,7 @@ target_include_directories(lotus_a PRIVATE
 target_link_libraries(lotus_a
     PRIVATE uvw::uvw
     PRIVATE dl
+    PRIVATE msgpackc msgpackc-cxx
 )
 
 message(STATUS "make liblotus - done")
