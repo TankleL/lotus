@@ -34,11 +34,14 @@ set(LIBLOTUS_SOURCE_FILES
 )
 
 set(LIBLOTUS_PROTOCOL_FILES
+    protocols/protobase.cxx
+    protocols/protobase.hxx
     protocols/proto-session-lstnr.cxx
     protocols/proto-session-lstnr.hxx
 )
 
 add_library(lotus_a STATIC
+    ${LIBLOTUS_PROTOCOL_FILES}
     ${LIBLOTUS_SOURCE_FILES}
     ${LIBLOTUS_INCLUDE_FILES} # for the convienece of searching in IDE
     ${LIBLOTUS_INCLUDE_INTERNAL_FILES} # for the convienece of searching in IDE
