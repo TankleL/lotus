@@ -5,39 +5,66 @@
 
 namespace lotus::core::protocols
 {
+    class ProtocolPackage final
+    {
+    public:
+        static constexpr size_t fixed_header_len = 2;
+
+    public:
+        ProtocolPackage() noexcept;
+        ~ProtocolPackage() noexcept;
+        ProtocolPackage(const ProtocolPackage&) = default;
+        ProtocolPackage(ProtocolPackage&&) = default;
+        ProtocolPackage& operator=(const ProtocolPackage&) = default;
+        ProtocolPackage& operator=(ProtocolPackage&&) = default;
+
+    public:
+        size_t length() noexcept;
+        size_t payload_length() noexcept;
+        const char* data() noexcept;
+        void append(const char* data, size_t length) noexcept;
+
+    private:
+        std::vector<char> _data;
+    };
+
     class ProtocolBase
     {
     public:
-        typedef std::vector<char> packed_result_t;
+        ProtocolPackage pack() noexcept;
 
     public:
         virtual ~ProtocolBase() noexcept {};
-        virtual void pack() noexcept = 0;
-        virtual const packed_result_t& data() noexcept = 0;
-        virtual void release(packed_result_t&) noexcept = 0;
+        virtual void on_packing(ProtocolPackage& data) noexcept = 0;
     };
 
     struct ProtocolRequest : public ProtocolBase
     {
+        ProtocolRequest() noexcept;
+        virtual ~ProtocolRequest() noexcept;
+
+        ProtocolRequest(const ProtocolRequest&) = default;
+        ProtocolRequest(ProtocolRequest&&) = default;
+        ProtocolRequest& operator=(const ProtocolRequest&) = default;
+        ProtocolRequest& operator=(ProtocolRequest&&) = default;
+
+        virtual void on_packing(
+            ProtocolPackage& data) noexcept override;
     };
 
     struct ProtocolResponse : public ProtocolBase
     {
         int result_code;
 
-        ProtocolResponse();
+        ProtocolResponse() noexcept;
+        virtual ~ProtocolResponse() noexcept;
         ProtocolResponse(const ProtocolResponse&) = default;
         ProtocolResponse(ProtocolResponse&&) = default;
         ProtocolResponse& operator=(const ProtocolResponse&) = default;
         ProtocolResponse& operator=(ProtocolResponse&&) = default;
-        ~ProtocolResponse();
 
-        virtual void pack() noexcept override;
-        virtual const packed_result_t& data() noexcept;
-        virtual void release(packed_result_t&) noexcept;
-
-    private:
-        packed_result_t _cache;
+        virtual void on_packing(
+            ProtocolPackage& data) noexcept override;
     };
 }
 

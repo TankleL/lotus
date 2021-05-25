@@ -4,6 +4,7 @@ int main(int argc, char** argv)
 {
     using namespace lotus::core;
 
+
     auto loop = std::shared_ptr<STALoop>(STALoop::create());
     auto conn =
         std::make_shared<connection::TCPClientSideConnection>(loop);

@@ -5,14 +5,19 @@
 
 namespace lotus::core::protocols::proto_session_lstnr
 {
-    struct ControlHeaderReq : public ProtocolRequest 
+    struct ControlHeaderReq final : public ProtocolRequest 
     {
-        enum struct Intention : int
+        constexpr static int req_id = 1;
+        enum struct intention_e : int
         {
             NewSession = 0,
             RejoinSession = 1,
             LeaveSession = 2
-        };
+        } intention;
+
+
+        void on_packing(
+            ProtocolPackage& data) noexcept override;
     };
 
     class ControlHeaderRsp

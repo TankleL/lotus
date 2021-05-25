@@ -13,6 +13,8 @@ set(LIBLOTUS_INCLUDE_FILES
     inc/session-lstnr.hxx
     inc/staloop.hxx
     inc/uuid.hxx
+    inc/vlint.hxx
+    inc/vluint.hxx
 )
 
 set(LIBLOTUS_INCLUDE_INTERNAL_FILES
@@ -31,6 +33,8 @@ set(LIBLOTUS_SOURCE_FILES
     src/staloop.cxx
     src/staloop-intl.cxx
     src/uuid.cxx
+    src/vlint.cxx
+    src/vluint.cxx
 )
 
 set(LIBLOTUS_PROTOCOL_FILES
@@ -51,6 +55,7 @@ target_include_directories(lotus_a PRIVATE
     "inc"
     "inc/connection"
     "inc-intl"
+    "protocols"
 )
 
 target_link_libraries(lotus_a
