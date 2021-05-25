@@ -15,7 +15,6 @@ namespace lotus::core::protocols::proto_session_lstnr
             LeaveSession = 2
         } intention;
 
-
         void on_packing(
             ProtocolPackage& data) noexcept override;
     };

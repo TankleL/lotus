@@ -9,6 +9,8 @@ namespace lotus::core::protocols::proto_session_lstnr
         msgpack::packer pkr(&sbuf);
 
         pkr.pack(req_id);
+        pkr.pack(intention);
+
         data.append(sbuf.data(), sbuf.size());
     }
 } // namespace lotus::core::protocols::proto_session_lstnr
