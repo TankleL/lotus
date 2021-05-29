@@ -28,7 +28,26 @@ namespace lotus::core
             IServerSideConnection& conn) noexcept;
 
     public:
-        bool eat(const char* data, size_t length) noexcept;
+        bool parse(const char* data, size_t length) noexcept;
+
+    public:
+        bool _parse_payload_single_pack(
+            const char* data,
+            size_t length) noexcept;
+        void _ensure_tmp_pack_data_container();
+
+    private:
+        enum class _parse_state_e : int
+        {
+            PS_Idle = 0,
+            PS_Len0,
+            PS_Len1,
+            PS_Payload,
+        } _parse_state;
+
+        std::vector<char*> _tmp_pack_data;
+        size_t _tmp_pack_length;
+        size_t _tmp_readlength;
     };
 }
 

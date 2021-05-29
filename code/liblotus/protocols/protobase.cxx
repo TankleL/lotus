@@ -50,15 +50,47 @@ namespace lotus::core::protocols
         return result;
     }
 
+    bool ProtocolBase::unpack(
+        const char* data,
+        size_t length) noexcept
+    {
+        msgpack::unpacker pac;
+        pac.reserve_buffer(length);
+        memcpy(pac.buffer(), data, length);
+        pac.buffer_consumed(length);
+
+        return on_unpacking(&pac);
+    }
+
     // ProtocolRequest ----------------------------------------------
     ProtocolRequest::ProtocolRequest() noexcept
+        : request_id(0)
     {}
 
     ProtocolRequest::~ProtocolRequest() noexcept
     {}
 
     void ProtocolRequest::on_packing(ProtocolPackage& data) noexcept
-    {}
+    {
+        //TODO: optimize this part into a zero-copy way in future
+        msgpack::sbuffer buf;
+        msgpack::packer pkr(&buf);
+
+        pkr.pack(request_id);
+
+        data.append(buf.data(), buf.size());
+    }
+
+    bool ProtocolRequest::on_unpacking(void* native_pac) noexcept
+    {
+        auto pac = static_cast<msgpack::unpacker*>(native_pac);
+        msgpack::object_handle objh;
+        if (!pac->next(objh))
+            return false;
+
+        const auto& msgobj = objh.get();
+        return msgobj.convert_if_not_nil<int>(request_id);
+    }
 
     // ProtocolResponse ---------------------------------------------
 
@@ -71,6 +103,7 @@ namespace lotus::core::protocols
 
     void ProtocolResponse::on_packing(ProtocolPackage& data) noexcept
     {
+        // TODO: optimize this part into a zero-copy way in future
         msgpack::sbuffer buf;
         msgpack::packer pkr(&buf);
 

@@ -9,7 +9,7 @@ namespace lotus::core
 {
     /*
      * Session is aiming to reuse the connection for business
-     * purposes. Session maintains a context for shor-term usage.
+     * purposes. Session maintains a context for shor-term usages.
      */
     class Session
     {

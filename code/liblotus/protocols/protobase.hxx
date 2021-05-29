@@ -32,14 +32,18 @@ namespace lotus::core::protocols
     {
     public:
         ProtocolPackage pack() noexcept;
+        bool unpack(const char* data, size_t length) noexcept;
 
     public:
         virtual ~ProtocolBase() noexcept {};
         virtual void on_packing(ProtocolPackage& data) noexcept = 0;
+        virtual bool on_unpacking(void* native_pac) noexcept = 0;
     };
 
     struct ProtocolRequest : public ProtocolBase
     {
+        int request_id;
+
         ProtocolRequest() noexcept;
         virtual ~ProtocolRequest() noexcept;
 
@@ -50,6 +54,7 @@ namespace lotus::core::protocols
 
         virtual void on_packing(
             ProtocolPackage& data) noexcept override;
+        virtual bool on_unpacking(void* native_pac) noexcept override;
     };
 
     struct ProtocolResponse : public ProtocolBase
