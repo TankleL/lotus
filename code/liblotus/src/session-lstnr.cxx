@@ -96,37 +96,53 @@ namespace lotus::core
         {
             using namespace protocols::proto_session_lstnr;
 
-            ControlHeaderReq req;
+            SessionReq req;
             if (!req.unpack(data, length))
                 return false;
-            if (req.request_id != ControlHeaderReq::REQ_ID)
+            if (req.request_id != SessionReq::REQ_ID)
                 return false;
 
             switch(req.intention)
             {
-            case ControlHeaderReq::intention_e::NewSession:
+            case SessionReq::intention_e::NewSession:
+                _new_session();
                 break;
 
             default:
                 // bad or not supported intentions
                 return false;
             }
+
+            return true;
         }
+        return false;
     }
 
     void SessionListener::_ensure_tmp_pack_data_container()
     {
+        assert(_tmp_pack_length > 0);
+        _tmp_pack_data.resize(_tmp_pack_length);
+    }
 
+    void SessionListener::_new_session()
+    {
+        auto sid = UUID::generate_v4();
+        auto sess = std::make_shared<Session>(sid, _conn);
+
+        assert(_sessions.find(sid) == _sessions.cend());
+        _sessions.insert(std::make_pair(sid, sess));
     }
 
     SessionListener& SessionListener::bind(
-        IServerSideConnection& conn) noexcept
+        const std::shared_ptr<IServerSideConnection>& conn) noexcept
     {
         auto instance = std::make_unique<SessionListener>();
-        auto* retval = instance.get();
 
-        conn.attach(conn.ATTID_SessionListener, std::move(instance));
-        conn.on_data_received = []
+        auto* retval = instance.get();
+        retval->_conn = conn;
+
+        conn->attach(conn->ATTID_SessionListener, std::move(instance));
+        conn->on_data_received = []
         (IServerSideConnection& conn,
             const char* data,
             size_t len) -> bool

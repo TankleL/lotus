@@ -17,11 +17,6 @@ namespace lotus::core::connection
         connect_callback_t cb)
     {
         using namespace lotus::core::_internal;
-
-        core::protocols::proto_session_lstnr::ControlHeaderReq req;
-        req.pack();
-
-
         ConnString cs(conn_str);
 
         auto loop = _loop.lock();

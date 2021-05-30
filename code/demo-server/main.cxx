@@ -16,7 +16,7 @@ int main(int argc, char** argv)
     (std::shared_ptr<connection::TCPServerSideConnection>& conn){
         conn_collection.emplace_back(conn);
 
-        SessionListener::bind(*conn);
+        SessionListener::bind(conn);
         conn->read();
     };
     conn_listener.listen("host=127.0.0.1; port=50500");

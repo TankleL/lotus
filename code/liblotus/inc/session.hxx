@@ -3,7 +3,9 @@
 
 #include <memory>
 #include <functional>
+
 #include "conn.hxx"
+#include "uuid.hxx"
 
 namespace lotus::core
 {
@@ -18,7 +20,8 @@ namespace lotus::core
 
     public:
         Session() = delete;
-        Session(std::weak_ptr<IConnection> conn);
+        Session(const UUID& id,
+            std::weak_ptr<IConnection> conn);
 
     public:
         void on_msg_sent();
@@ -26,6 +29,9 @@ namespace lotus::core
         void on_error();
 
         void send_msg();
+
+    private:
+        UUID _id;
 
     private:
         std::weak_ptr<IConnection> _conn;

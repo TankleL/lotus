@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 
     conn->connect("host=127.0.0.1; port=50500", []() {});
 
-    Session session(conn);
+    Session session(UUID(), conn);
     session.send_msg();
 
 

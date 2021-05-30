@@ -5,27 +5,28 @@
 
 namespace lotus::core::protocols::proto_session_lstnr
 {
-    struct ControlHeaderReq final : public ProtocolRequest 
+    struct SessionReq final : public ProtocolRequest 
     {
-        static constexpr int REQ_ID = 1;
+        static constexpr int REQ_ID = 0x00000101;
 
-        ControlHeaderReq() noexcept;
+        SessionReq () noexcept;
 
         enum class intention_e : int
         {
             BadIntention = 0,
             NewSession = 1,
-            StoreSession = 2,
-            RejoinSession = 3,
-            LeaveSession = 4
+            SessionData = 2,
+            AbortSession = 3
         } intention;
+
+        std::vector<char> payload;
 
         void on_packing(
             ProtocolPackage& data) noexcept override;
         bool on_unpacking(void* native_pac) noexcept override;
     };
 
-    class ControlHeaderRsp
+    struct SessionRsp final : public ProtocolResponse
     {};
 } // namespace lotus::core::protocols::proto_session_lstnr
 

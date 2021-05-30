@@ -85,11 +85,20 @@ namespace lotus::core::protocols
     {
         auto pac = static_cast<msgpack::unpacker*>(native_pac);
         msgpack::object_handle objh;
-        if (!pac->next(objh))
-            return false;
 
-        const auto& msgobj = objh.get();
-        return msgobj.convert_if_not_nil<int>(request_id);
+        try
+        {
+            if (!pac->next(objh))
+                return false;
+
+            // unpack request_id
+            const auto& msgobj = objh.get();
+            return msgobj.convert(request_id);
+        }
+        catch(msgpack::unpack_error uex)
+        {
+            return false;
+        }
     }
 
     // ProtocolResponse ---------------------------------------------

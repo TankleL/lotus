@@ -2,8 +2,10 @@
 
 namespace lotus::core
 {
-    Session::Session(std::weak_ptr<IConnection> conn)
-        : _conn(conn)
+    Session::Session(const UUID& id,
+        std::weak_ptr<IConnection> conn)
+        : _id(id)
+        , _conn(conn)
     {}
 
     void Session::send_msg()
