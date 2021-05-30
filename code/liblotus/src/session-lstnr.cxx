@@ -5,7 +5,7 @@
 namespace lotus::core
 {
     SessionListener::SessionListener() noexcept
-        : _parse_state(_parse_state_e::PS_Idle)
+        : _parse_state(_parse_state_e::idle)
         , _tmp_pack_length(0)
         , _tmp_readlength(0)
     {}
@@ -23,34 +23,34 @@ namespace lotus::core
             size_t wideval = 0;
             switch (_parse_state)
             {
-            case _parse_state_e::PS_Idle:
+            case _parse_state_e::idle:
                 // initialize temporary fields
                 _tmp_pack_length = 0;
                 _tmp_readlength = 0;
                 
                 // next state
-                _parse_state = _parse_state_e::PS_Len0;
+                _parse_state = _parse_state_e::len0;
 
                 [[fallthrough]]; // this is important
 
-            case _parse_state_e::PS_Len0:
+            case _parse_state_e::len0:
                 // low 8 bytes of the length
                 _tmp_pack_length = curval;
 
                 // next state
-                _parse_state = _parse_state_e::PS_Len1;
+                _parse_state = _parse_state_e::len1;
                 break;
 
-            case _parse_state_e::PS_Len1:
+            case _parse_state_e::len1:
                 // high 8 bytes of the length
                 wideval = curval;
                 _tmp_pack_length |= wideval << 8;
 
                 // next state
-                _parse_state = _parse_state_e::PS_Payload;
+                _parse_state = _parse_state_e::payload;
                 break;
 
-            case _parse_state_e::PS_Payload:
+            case _parse_state_e::payload:
                 if (_tmp_pack_length != 0)
                 {
                     _ensure_tmp_pack_data_container();
@@ -104,7 +104,7 @@ namespace lotus::core
 
             switch(req.intention)
             {
-            case SessionReq::intention_e::NewSession:
+            case SessionReq::intention_e::new_session:
                 _new_session();
                 break;
 
@@ -113,6 +113,7 @@ namespace lotus::core
                 return false;
             }
 
+            _parse_state = _parse_state_e::idle;
             return true;
         }
         return false;

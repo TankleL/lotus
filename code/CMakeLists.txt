@@ -19,7 +19,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # set important include paths
-set(LIBLOTUS_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/liblotus/inc")
+set(LIBLOTUS_INCLUDE
+    "${CMAKE_CURRENT_SOURCE_DIR}/liblotus/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/liblotus/protocols")
 
 # sub directories
 add_subdirectory(liblotus)

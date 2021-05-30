@@ -13,10 +13,10 @@ namespace lotus::core::protocols::proto_session_lstnr
 
         enum class intention_e : int
         {
-            BadIntention = 0,
-            NewSession = 1,
-            SessionData = 2,
-            AbortSession = 3
+            bad_intention= 0,
+            new_session= 1,
+            session_data = 2,
+            abort_session = 3
         } intention;
 
         std::vector<char> payload;

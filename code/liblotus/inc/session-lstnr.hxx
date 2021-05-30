@@ -29,7 +29,8 @@ namespace lotus::core
 
     public:
         static SessionListener& bind(
-            const std::shared_ptr<IServerSideConnection>& conn) noexcept;
+            const std::shared_ptr<IServerSideConnection>& conn)
+            noexcept;
 
     public:
         bool parse(const char* data, size_t length) noexcept;
@@ -51,10 +52,10 @@ namespace lotus::core
     private:
         enum class _parse_state_e : int
         {
-            PS_Idle = 0,
-            PS_Len0,
-            PS_Len1,
-            PS_Payload,
+            idle = 0,
+            len0,
+            len1,
+            payload,
         } _parse_state;
 
         std::vector<char*> _tmp_pack_data;

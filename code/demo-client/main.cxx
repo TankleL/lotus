@@ -9,10 +9,12 @@ int main(int argc, char** argv)
     auto conn =
         std::make_shared<connection::TCPClientSideConnection>(loop);
 
-    conn->connect("host=127.0.0.1; port=50500", []() {});
-
-    Session session(UUID(), conn);
-    session.send_msg();
+    conn->connect("host=127.0.0.1; port=50500", [conn]()
+    {
+        std::vector<char> msg({'H', 'E', 'L', 'L', 'O'});
+        Session session(conn);
+        session.send_msg(std::move(msg));
+    });
 
 
     loop->run();

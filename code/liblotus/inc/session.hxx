@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "conn.hxx"
+#include "proto-session-lstnr.hxx"
 #include "uuid.hxx"
 
 namespace lotus::core
@@ -20,21 +21,37 @@ namespace lotus::core
 
     public:
         Session() = delete;
+        Session(std::weak_ptr<IConnection> conn) noexcept;
         Session(const UUID& id,
-            std::weak_ptr<IConnection> conn);
+            std::weak_ptr<IConnection> conn) noexcept;
 
     public:
         void on_msg_sent();
         void on_msg_received();
         void on_error();
 
-        void send_msg();
+        void send_msg(const char* data, size_t length) noexcept;
+        void send_msg(std::vector<char>&& data) noexcept;
+
+    private:
+        void _ensure_nsrs(
+            protocols::proto_session_lstnr::SessionReq& req)
+            noexcept;
+        void _send_req(
+            protocols::proto_session_lstnr::SessionReq& req)
+            noexcept;
 
     private:
         UUID _id;
+        std::weak_ptr<IConnection> _conn;
 
     private:
-        std::weak_ptr<IConnection> _conn;
+        enum class new_session_req_state_e
+        {
+            not_sent = 0,
+            wait_for_rsp,
+            remote_acked 
+        } _nsrs_state;
     };
 } // namespace lotus::core
 

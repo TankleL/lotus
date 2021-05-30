@@ -4,7 +4,7 @@
 namespace lotus::core::protocols::proto_session_lstnr
 {
     SessionReq::SessionReq() noexcept
-        : intention(intention_e::BadIntention)
+        : intention(intention_e::bad_intention)
     {
         request_id = REQ_ID;
     }
