@@ -21,9 +21,8 @@ namespace lotus::core
 
     public:
         Session() = delete;
-        Session(std::weak_ptr<IConnection> conn) noexcept;
-        Session(const UUID& id,
-            std::weak_ptr<IConnection> conn) noexcept;
+        Session(IConnection* conn) noexcept;
+        Session(const UUID& id, IConnection* conn) noexcept;
 
     public:
         void on_msg_sent();
@@ -43,7 +42,7 @@ namespace lotus::core
 
     private:
         UUID _id;
-        std::weak_ptr<IConnection> _conn;
+        IConnection* _conn;
 
     private:
         enum class new_session_req_state_e

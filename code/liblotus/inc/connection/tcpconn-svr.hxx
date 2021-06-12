@@ -17,18 +17,18 @@ namespace lotus::core::connection
     {
     public:
         typedef std::function<
-            void(std::shared_ptr<TCPServerSideConnection>& conn)>
+            void(std::unique_ptr<TCPServerSideConnection>& conn)>
             create_conn_callback_t;
         create_conn_callback_t on_create_connection;
 
     public:
-        TCPConnectionListener(std::weak_ptr<STALoop> loop);
+        TCPConnectionListener(STALoop* loop);
 
     public:
         void listen(const std::string& connstr) noexcept;
 
     private:
-        std::weak_ptr<STALoop> _loop;
+        STALoop* _loop;
     };
     
     // TCPServerSideConnection  -------------------------------------
@@ -49,7 +49,7 @@ namespace lotus::core::connection
         void close() noexcept;
 
     public:
-        static std::shared_ptr<TCPServerSideConnection>
+        static std::unique_ptr<TCPServerSideConnection>
             accept(void* tcp_server_handle) noexcept;
 
     private:

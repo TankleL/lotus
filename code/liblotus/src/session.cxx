@@ -5,14 +5,13 @@
 
 namespace lotus::core
 {
-    Session::Session(std::weak_ptr<IConnection> conn) noexcept
+    Session::Session(IConnection* conn) noexcept
         : _id(UUID())
         , _conn(conn)
         , _nsrs_state(new_session_req_state_e::not_sent)
     {}
 
-    Session::Session(const UUID& id,
-        std::weak_ptr<IConnection> conn) noexcept
+    Session::Session(const UUID& id, IConnection* conn) noexcept
         : _id(id)
         , _conn(conn)
         , _nsrs_state(new_session_req_state_e::not_sent)
@@ -51,12 +50,10 @@ namespace lotus::core
     void Session::_send_req(
         protocols::proto_session_lstnr::SessionReq& req) noexcept
     {
-        auto conn = _conn.lock();
-        if (conn != nullptr)
-        {
-            auto package = req.pack();
-            conn->write(); // TODO:
-        }
+        assert(_conn != nullptr);
+
+        auto package = req.pack();
+        _conn->write(); // TODO:
     }
 
     void Session::_ensure_nsrs(

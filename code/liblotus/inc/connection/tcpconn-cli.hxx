@@ -11,7 +11,7 @@ namespace lotus::core::connection
         public IClientSideConnection
     {
     public:
-        TCPClientSideConnection(std::weak_ptr<STALoop> loop);
+        TCPClientSideConnection(STALoop* loop);
 
     public:
         void connect(
@@ -20,13 +20,13 @@ namespace lotus::core::connection
 
         void disconnect() noexcept override;
 
-        void write() override {}
+        void write() override;
         void read() override {}
         void on_error() override {}
 
     private:
-        std::weak_ptr<STALoop> _loop;
-        std::weak_ptr<void> _tcp_handle;
+        STALoop* _loop;
+        std::shared_ptr<void> _tcp_handle;
         bool _is_connected;
     };
 } // namespace lotus::core::connection

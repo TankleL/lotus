@@ -128,14 +128,14 @@ namespace lotus::core
     void SessionListener::_new_session()
     {
         auto sid = UUID::generate_v4();
-        auto sess = std::make_shared<Session>(sid, _conn);
+        auto sess = std::make_unique<Session>(sid, _conn);
 
         assert(_sessions.find(sid) == _sessions.cend());
-        _sessions.insert(std::make_pair(sid, sess));
+        _sessions.insert(std::make_pair(sid, std::move(sess)));
     }
 
     SessionListener& SessionListener::bind(
-        const std::shared_ptr<IServerSideConnection>& conn) noexcept
+        IServerSideConnection* conn) noexcept
     {
         auto instance = std::make_unique<SessionListener>();
 

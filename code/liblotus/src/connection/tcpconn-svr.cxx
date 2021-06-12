@@ -6,8 +6,7 @@ namespace lotus::core::connection
 {
     // TCPConnectionListener ----------------------------------------
 
-    TCPConnectionListener::TCPConnectionListener(
-        std::weak_ptr<STALoop> loop)
+    TCPConnectionListener::TCPConnectionListener(STALoop* loop)
         : _loop(loop)
     {}
 
@@ -16,23 +15,19 @@ namespace lotus::core::connection
     {
         using namespace _internal;
 
-        auto loop = _loop.lock();
-        if(loop != nullptr)
-        {
-            ConnString cs(connstr);
+        ConnString cs(connstr);
 
-            auto l = expose_impl(loop.get())->_native_loop();
-            auto tcp = l->resource<uvw::TCPHandle>();
-            tcp->on<uvw::ListenEvent>([this]
-            (const uvw::ListenEvent&, uvw::TCPHandle& svr) {
-                auto conn = TCPServerSideConnection::accept(&svr);
-                if(this->on_create_connection != nullptr)
-                    this->on_create_connection(conn);
-            });
+        auto l = expose_impl(_loop)->_native_loop();
+        auto tcp = l->resource<uvw::TCPHandle>();
+        tcp->on<uvw::ListenEvent>([this]
+        (const uvw::ListenEvent&, uvw::TCPHandle& svr) {
+            auto conn = TCPServerSideConnection::accept(&svr);
+            if(this->on_create_connection != nullptr)
+                this->on_create_connection(conn);
+        });
 
-            tcp->bind(cs.host(), cs.port());
-            tcp->listen();
-        }
+        tcp->bind(cs.host(), cs.port());
+        tcp->listen();
     }
 
     // TCPServerSideConnection --------------------------------------
@@ -45,24 +40,23 @@ namespace lotus::core::connection
         close();
     }
 
-    std::shared_ptr<TCPServerSideConnection>
+    std::unique_ptr<TCPServerSideConnection>
         TCPServerSideConnection::accept(
             void* tcp_server_handle) noexcept
     {
         auto tcp_svr = static_cast<uvw::TCPHandle*>(
             tcp_server_handle);
-        auto conn = std::shared_ptr<TCPServerSideConnection>(
-            new TCPServerSideConnection);
+        auto conn = std::unique_ptr<TCPServerSideConnection>(
+            new TCPServerSideConnection());
 
         auto client = tcp_svr->loop().resource<uvw::TCPHandle>();
-        client->on<uvw::DataEvent>([connection = std::weak_ptr(conn)]
+        client->on<uvw::DataEvent>([connection = conn.get()]
         (const uvw::DataEvent& de, uvw::TCPHandle& tcp) {
             bool close_conn = false;
-            auto conn = connection.lock();
-            if(conn != nullptr && conn->on_data_received != nullptr)
+            if(connection->on_data_received != nullptr)
             {
-                close_conn = conn->on_data_received(
-                    *conn,
+                close_conn = connection->on_data_received(
+                    *connection,
                     de.data.get(),
                     de.length);
             }
@@ -72,7 +66,7 @@ namespace lotus::core::connection
             }
 
             if(close_conn)
-                conn->close();
+                connection->close();
         });
 
         conn->_tcp_client_handle = client;

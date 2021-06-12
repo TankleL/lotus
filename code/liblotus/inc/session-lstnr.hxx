@@ -29,7 +29,7 @@ namespace lotus::core
 
     public:
         static SessionListener& bind(
-            const std::shared_ptr<IServerSideConnection>& conn)
+            IServerSideConnection* conn)
             noexcept;
 
     public:
@@ -43,10 +43,10 @@ namespace lotus::core
         void _new_session();
 
     private:
-        std::weak_ptr<IConnection> _conn;
+        IConnection* _conn;
         std::unordered_map<
             UUID,
-            std::shared_ptr<Session>,
+            std::unique_ptr<Session>,
             uuid_hasher> _sessions;
 
     private:
