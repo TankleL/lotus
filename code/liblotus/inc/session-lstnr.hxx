@@ -58,7 +58,7 @@ namespace lotus::core
             payload,
         } _parse_state;
 
-        std::vector<char*> _tmp_pack_data;
+        std::vector<char> _tmp_pack_data;
         size_t _tmp_pack_length;
         size_t _tmp_readlength;
     };

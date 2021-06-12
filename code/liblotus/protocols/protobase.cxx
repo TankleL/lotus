@@ -34,8 +34,7 @@ namespace lotus::core::protocols
         _data.insert(_data.end(), data, data + length);
         const auto payload_len =
             _data.size()
-            - fixed_header_len
-            + length;
+            - fixed_header_len;
         const auto masked_payload_len =
             payload_len & 0x0000ffff;
         _data[0] = static_cast<char>(masked_payload_len & 0x00ff);

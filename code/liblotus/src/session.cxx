@@ -53,7 +53,7 @@ namespace lotus::core
         assert(_conn != nullptr);
 
         auto package = req.pack();
-        _conn->write(); // TODO:
+        _conn->write(package.data(), package.length());
     }
 
     void Session::_ensure_nsrs(

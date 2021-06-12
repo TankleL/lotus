@@ -20,7 +20,7 @@ namespace lotus::core::connection
 
         void disconnect() noexcept override;
 
-        void write() override;
+        size_t write(const char* data, size_t length) override;
         void read() override {}
         void on_error() override {}
 

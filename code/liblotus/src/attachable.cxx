@@ -6,7 +6,8 @@ namespace lotus::core
         int index,
         std::unique_ptr<IAttachment>&& attachment) noexcept
     {
-        _attachments[index] = std::move(attachment);
+        //_attachments[index] = std::move(attachment);
+        _attachments.emplace(std::make_pair(index, std::move(attachment)));
     }
 
     IAttachment* Attachable::attachment(int index) noexcept

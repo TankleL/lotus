@@ -8,11 +8,15 @@ int main(int argc, char** argv)
     auto loop = std::unique_ptr<STALoop>(STALoop::create());
     auto conn = connection::TCPClientSideConnection(loop.get());
 
-    conn.connect("host=127.0.0.1; port=50500", [connection = &conn]()
+    conn.connect("host=127.0.0.1; port=50500", []
+    (IClientSideConnection* conn)
     {
-        std::vector<char> msg({'H', 'E', 'L', 'L', 'O'});
-        Session session(connection);
-        session.send_msg(std::move(msg));
+        for (int i = 0; i < 10000; ++i)
+        {
+            std::vector<char> msg({ 'H', 'E', 'L', 'L', 'O' });
+            Session session(conn);
+            session.send_msg(std::move(msg));
+        }
     });
 
     loop->run();

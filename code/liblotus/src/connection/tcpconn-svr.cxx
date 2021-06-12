@@ -55,7 +55,7 @@ namespace lotus::core::connection
             bool close_conn = false;
             if(connection->on_data_received != nullptr)
             {
-                close_conn = connection->on_data_received(
+                close_conn = !connection->on_data_received(
                     *connection,
                     de.data.get(),
                     de.length);
@@ -72,7 +72,7 @@ namespace lotus::core::connection
         conn->_tcp_client_handle = client;
 
         tcp_svr->accept(*client);
-        return conn;
+        return std::move(conn);
     }
 
     void TCPServerSideConnection::read()

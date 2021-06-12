@@ -32,7 +32,11 @@ namespace lotus::core::connection
         });
 
         tcp->once<uvw::ConnectEvent>(
-            [](const uvw::ConnectEvent&, uvw::TCPHandle& tcp){
+            [this, cb]
+        (const uvw::ConnectEvent&, uvw::TCPHandle& tcp)
+        {
+            _is_connected = true;
+            cb(this);
         });
 
         tcp->connect(cs.host(), cs.port());
@@ -42,10 +46,33 @@ namespace lotus::core::connection
 
     void TCPClientSideConnection::disconnect() noexcept
     {
+        if(_is_connected)
+        {
+            _is_connected = false;
+            // TODO:
+        }
     }
 
-    void TCPClientSideConnection::write()
+    size_t TCPClientSideConnection::write(
+        const char* data,
+        size_t length)
     {
+        if (!_is_connected)
+        {
+            return 0;
+        }
+
+        auto tcp =
+            std::static_pointer_cast<uvw::TCPHandle>(_tcp_handle);
+        if(tcp->writable())
+        {
+            tcp->write(const_cast<char*>(data), length);
+            return length;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
 

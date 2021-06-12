@@ -5,7 +5,8 @@
 namespace lotus::core
 {
     SessionListener::SessionListener() noexcept
-        : _parse_state(_parse_state_e::idle)
+        : _conn(nullptr)
+        , _parse_state(_parse_state_e::idle)
         , _tmp_pack_length(0)
         , _tmp_readlength(0)
     {}
@@ -17,7 +18,8 @@ namespace lotus::core
         const char* data,
         size_t length) noexcept
     {
-        for (size_t i = 0; i < length; ++i)
+        size_t i = 0;
+        while(i < length)
         {
             const char curval = data[i];
             size_t wideval = 0;
@@ -39,6 +41,7 @@ namespace lotus::core
 
                 // next state
                 _parse_state = _parse_state_e::len1;
+                ++i;
                 break;
 
             case _parse_state_e::len1:
@@ -46,8 +49,15 @@ namespace lotus::core
                 wideval = curval;
                 _tmp_pack_length |= wideval << 8;
 
+                if (_tmp_pack_length >
+                    std::numeric_limits<uint16_t>::max())
+                {
+                    return false;
+                }
+
                 // next state
                 _parse_state = _parse_state_e::payload;
+                ++i;
                 break;
 
             case _parse_state_e::payload:
@@ -57,12 +67,16 @@ namespace lotus::core
 
                     const auto remaining_len = length - i;
                     const auto len_to_parse =
-                        std::min(remaining_len, _tmp_pack_length);
+                        std::min(
+                            remaining_len,
+                            _tmp_pack_length);
 
                     if (_parse_payload_single_pack(
                         data + i,
                         len_to_parse))
                     {
+                        i += len_to_parse;
+                        _parse_state = _parse_state_e::idle;
                         continue;
                     }
                     else
@@ -113,7 +127,6 @@ namespace lotus::core
                 return false;
             }
 
-            _parse_state = _parse_state_e::idle;
             return true;
         }
         return false;

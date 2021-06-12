@@ -14,10 +14,11 @@ int main(int argc, char** argv)
     conn_listener.on_create_connection =
         [&conn_collection]
     (std::unique_ptr<connection::TCPServerSideConnection>& conn){
+        auto conn_ptr = conn.get();
         conn_collection.emplace_back(std::move(conn));
 
-        SessionListener::bind(conn.get());
-        conn->read();
+        SessionListener::bind(conn_ptr);
+        conn_ptr->read();
     };
     conn_listener.listen("host=127.0.0.1; port=50500");
 
