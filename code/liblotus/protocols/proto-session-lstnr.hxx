@@ -1,6 +1,7 @@
 #ifndef LOTUS_PROTO_SESSION_LSTNR_H
 #define LOTUS_PROTO_SESSION_LSTNR_H
 
+#include "uuid.hxx"
 #include "protobase.hxx"
 
 namespace lotus::core::protocols::proto_session_lstnr
@@ -27,7 +28,17 @@ namespace lotus::core::protocols::proto_session_lstnr
     };
 
     struct SessionRsp final : public ProtocolResponse
-    {};
+    {
+        static constexpr int RSP_ID = 0x00000101;
+
+        SessionRsp() noexcept;
+
+        uint32_t session_id;
+
+        void on_packing(
+            ProtocolPackage& data) noexcept override;
+        bool on_unpacking(void* native_pac) noexcept override;
+    };
 } // namespace lotus::core::protocols::proto_session_lstnr
 
 #endif // !LOTUS_PROTO_SESSION_LSTNR_H

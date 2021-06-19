@@ -1,6 +1,7 @@
 #include <cassert>
 
 #include "connstr.hxx"
+#include "session-lstnr.hxx"
 #include "staloop-intl.hxx"
 #include "tcpconn-cli.hxx"
 #include "proto-session-lstnr.hxx"
@@ -27,15 +28,18 @@ namespace lotus::core::connection
             ->_native_loop()
             ->resource<uvw::TCPHandle>();
 
+        // erro event 
         tcp->on<uvw::ErrorEvent>(
             [](const uvw::ErrorEvent&, uvw::TCPHandle&){
         });
 
+        // connect event
         tcp->once<uvw::ConnectEvent>(
             [this, cb]
-        (const uvw::ConnectEvent&, uvw::TCPHandle& tcp)
+        (const uvw::ConnectEvent& ce, uvw::TCPHandle& tcp)
         {
             _is_connected = true;
+            SessionListener::bind(this);
             cb(this);
         });
 

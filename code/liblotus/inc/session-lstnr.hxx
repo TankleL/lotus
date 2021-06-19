@@ -7,6 +7,7 @@
 
 #include "attachable.hxx"
 #include "conn.hxx"
+#include "proto-session-lstnr.hxx"
 #include "session.hxx"
 #include "uuid.hxx"
 
@@ -29,7 +30,7 @@ namespace lotus::core
 
     public:
         static SessionListener& bind(
-            IServerSideConnection* conn)
+            IConnection* conn)
             noexcept;
 
     public:
@@ -40,14 +41,16 @@ namespace lotus::core
             const char* data,
             size_t length) noexcept;
         void _ensure_tmp_pack_data_container();
-        void _new_session();
+        void _new_session(
+            const protocols::proto_session_lstnr::SessionReq& req);
 
     private:
         IConnection* _conn;
+        // TODO: add session manager later
         std::unordered_map<
-            UUID,
-            std::unique_ptr<Session>,
-            uuid_hasher> _sessions;
+            uint32_t,
+            std::unique_ptr<Session>> _sessions; 
+        uint32_t _last_sid;
 
     private:
         enum class _parse_state_e : int

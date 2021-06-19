@@ -6,7 +6,6 @@
 
 #include "conn.hxx"
 #include "proto-session-lstnr.hxx"
-#include "uuid.hxx"
 
 namespace lotus::core
 {
@@ -22,7 +21,7 @@ namespace lotus::core
     public:
         Session() = delete;
         Session(IConnection* conn) noexcept;
-        Session(const UUID& id, IConnection* conn) noexcept;
+        Session(uint32_t id, IConnection* conn) noexcept;
 
     public:
         void on_msg_sent();
@@ -41,7 +40,7 @@ namespace lotus::core
             noexcept;
 
     private:
-        UUID _id;
+        uint32_t _id;
         IConnection* _conn;
 
     private:

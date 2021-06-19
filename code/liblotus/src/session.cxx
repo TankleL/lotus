@@ -6,12 +6,12 @@
 namespace lotus::core
 {
     Session::Session(IConnection* conn) noexcept
-        : _id(UUID())
+        : _id(0)
         , _conn(conn)
         , _nsrs_state(new_session_req_state_e::not_sent)
     {}
 
-    Session::Session(const UUID& id, IConnection* conn) noexcept
+    Session::Session(uint32_t id, IConnection* conn) noexcept
         : _id(id)
         , _conn(conn)
         , _nsrs_state(new_session_req_state_e::not_sent)

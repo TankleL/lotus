@@ -42,7 +42,8 @@ namespace lotus::core::protocols
 
     struct ProtocolRequest : public ProtocolBase
     {
-        int request_id;
+        int32_t request_id;
+        uint32_t trx_id;
 
         ProtocolRequest() noexcept;
         virtual ~ProtocolRequest() noexcept;
@@ -59,7 +60,8 @@ namespace lotus::core::protocols
 
     struct ProtocolResponse : public ProtocolBase
     {
-        int result_code;
+        int32_t result_code;
+        uint32_t trx_id;
 
         ProtocolResponse() noexcept;
         virtual ~ProtocolResponse() noexcept;
@@ -70,6 +72,7 @@ namespace lotus::core::protocols
 
         virtual void on_packing(
             ProtocolPackage& data) noexcept override;
+        virtual bool on_unpacking(void* native_pac) noexcept override;
     };
 }
 

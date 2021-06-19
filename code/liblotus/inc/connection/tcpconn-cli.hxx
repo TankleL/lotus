@@ -21,8 +21,6 @@ namespace lotus::core::connection
         void disconnect() noexcept override;
 
         size_t write(const char* data, size_t length) override;
-        void read() override {}
-        void on_error() override {}
 
     private:
         STALoop* _loop;

@@ -64,6 +64,7 @@ namespace lotus::core::protocols
     // ProtocolRequest ----------------------------------------------
     ProtocolRequest::ProtocolRequest() noexcept
         : request_id(0)
+        , trx_id(0)
     {}
 
     ProtocolRequest::~ProtocolRequest() noexcept
@@ -76,6 +77,7 @@ namespace lotus::core::protocols
         msgpack::packer pkr(&buf);
 
         pkr.pack(request_id);
+        pkr.pack(trx_id);
 
         data.append(buf.data(), buf.size());
     }
@@ -87,23 +89,33 @@ namespace lotus::core::protocols
 
         try
         {
+            // unpack request_id
             if (!pac->next(objh))
                 return false;
 
-            // unpack request_id
-            const auto& msgobj = objh.get();
-            return msgobj.convert(request_id);
+            const auto& msg_reqid = objh.get();
+            msg_reqid.convert(request_id);
+
+            // unpack trx_id
+            if (!pac->next(objh))
+                return false;
+
+            const auto& msg_trxid = objh.get();
+            msg_trxid.convert(trx_id);
         }
         catch(msgpack::unpack_error uex)
         {
             return false;
         }
+
+        return true;
     }
 
     // ProtocolResponse ---------------------------------------------
 
     ProtocolResponse::ProtocolResponse() noexcept
         : result_code(0)
+        , trx_id(0)
     {}
 
     ProtocolResponse::~ProtocolResponse() noexcept
@@ -116,8 +128,37 @@ namespace lotus::core::protocols
         msgpack::packer pkr(&buf);
 
         pkr.pack(result_code);
+        pkr.pack(trx_id);
 
         data.append(buf.data(), buf.size());
+    }
+
+    bool ProtocolResponse::on_unpacking(void* native_pac) noexcept
+    {
+        auto pac = static_cast<msgpack::unpacker*>(native_pac);
+        msgpack::object_handle objh;
+
+        try
+        {
+            // unpack result_code
+            if (!pac->next(objh))
+                return false;
+
+            const auto& msg_rescode = objh.get();
+            msg_rescode.convert(result_code);
+
+            // unpack trx_id
+            if (!pac->next(objh))
+                return false;
+
+            const auto& msg_trxid = objh.get();
+            msg_trxid.convert(trx_id);
+        }
+        catch(msgpack::unpack_error uex)
+        {
+            return false;
+        }
+        return true;
     }
 } // namespace lotus::core::protocols
 

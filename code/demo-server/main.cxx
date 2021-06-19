@@ -18,7 +18,7 @@ int main(int argc, char** argv)
         conn_collection.emplace_back(std::move(conn));
 
         SessionListener::bind(conn_ptr);
-        conn_ptr->read();
+        //conn_ptr->read();
     };
     conn_listener.listen("host=127.0.0.1; port=50500");
 

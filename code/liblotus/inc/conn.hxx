@@ -7,20 +7,33 @@
 
 namespace lotus::core
 {
-    class IConnection
+    class IConnection : public Attachable
     {
+    public:
+        // reserved attachment id list
+        static constexpr int ATTID_SessionListener = 0;
+
+        // read callback
+        typedef std::function<
+            bool(
+                IConnection& conn,
+                const char* data,
+                size_t len)>
+            read_callback_t;
+        read_callback_t on_read;
+
+        // error callback
+        typedef std::function<void(void)> error_callback_t;
+        error_callback_t on_error;
+
     public:
         virtual ~IConnection() {}
 
     public:
         virtual size_t write(const char* data, size_t length) = 0;
-        virtual void read() = 0;
-        virtual void on_error() = 0;
     };
 
-    class IClientSideConnection :
-        public IConnection,
-        public Attachable
+    class IClientSideConnection : public IConnection
     {
     public:
         virtual ~IClientSideConnection() {}
@@ -36,22 +49,9 @@ namespace lotus::core
         virtual void disconnect() noexcept = 0;
     };
 
-    class IServerSideConnection :
-        public IConnection,
-        public Attachable
+    class IServerSideConnection : public IConnection
     {
     public:
-        // reserved attachment id list
-        static constexpr int ATTID_SessionListener = 0;
-
-    public:
-        typedef std::function<
-            bool(
-                IServerSideConnection& conn,
-                const char* data,
-                size_t len)>
-            data_received_callback_t;
-        data_received_callback_t on_data_received;
     public:
         virtual ~IServerSideConnection() {}
     };

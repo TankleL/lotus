@@ -12,7 +12,8 @@ namespace lotus::core
     class UUID
     {
     public:
-        typedef std::array<uint8_t, 16> data_t;
+        static constexpr int UUID_SIZE= 16;
+        typedef std::array<uint8_t, UUID_SIZE> data_t;
 
     public:
         UUID();

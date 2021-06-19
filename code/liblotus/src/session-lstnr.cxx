@@ -6,6 +6,7 @@ namespace lotus::core
 {
     SessionListener::SessionListener() noexcept
         : _conn(nullptr)
+        , _last_sid(0)
         , _parse_state(_parse_state_e::idle)
         , _tmp_pack_length(0)
         , _tmp_readlength(0)
@@ -119,7 +120,7 @@ namespace lotus::core
             switch(req.intention)
             {
             case SessionReq::intention_e::new_session:
-                _new_session();
+                _new_session(req);
                 break;
 
             default:
@@ -138,26 +139,40 @@ namespace lotus::core
         _tmp_pack_data.resize(_tmp_pack_length);
     }
 
-    void SessionListener::_new_session()
+    void SessionListener::_new_session(
+        const protocols::proto_session_lstnr::SessionReq& req)
     {
-        auto sid = UUID::generate_v4();
+        // create session
+        auto sid = ++_last_sid;
         auto sess = std::make_unique<Session>(sid, _conn);
 
         assert(_sessions.find(sid) == _sessions.cend());
         _sessions.insert(std::make_pair(sid, std::move(sess)));
+
+        // send response
+        using namespace protocols::proto_session_lstnr;
+        SessionRsp rsp;
+        rsp.trx_id = req.trx_id;
+        rsp.result_code = 200;
+
+        auto package = rsp.pack();
+        _conn->write(package.data(), package.length());
     }
 
     SessionListener& SessionListener::bind(
-        IServerSideConnection* conn) noexcept
+        IConnection* conn) noexcept
     {
         auto instance = std::make_unique<SessionListener>();
 
         auto* retval = instance.get();
         retval->_conn = conn;
 
-        conn->attach(conn->ATTID_SessionListener, std::move(instance));
-        conn->on_data_received = []
-        (IServerSideConnection& conn,
+        conn->attach(
+            conn->ATTID_SessionListener,
+            std::move(instance));
+
+        conn->on_read = []
+        (IConnection& conn,
             const char* data,
             size_t len) -> bool
         {
