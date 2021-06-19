@@ -16,6 +16,9 @@ namespace lotus::core
     class Session
     {
     public:
+        using session_req_t =
+            protocols::proto_session_lstnr::SessionReq<
+            protocols::ZeroBased>;
         typedef std::function<void()> recv_callback_t;
 
     public:
@@ -32,11 +35,8 @@ namespace lotus::core
         void send_msg(std::vector<char>&& data) noexcept;
 
     private:
-        void _ensure_nsrs(
-            protocols::proto_session_lstnr::SessionReq& req)
-            noexcept;
-        void _send_req(
-            protocols::proto_session_lstnr::SessionReq& req)
+        void _ensure_nsrs(session_req_t& req) noexcept;
+        void _send_req(session_req_t& req)
             noexcept;
 
     private:

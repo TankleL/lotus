@@ -16,6 +16,9 @@ namespace lotus::core
     class SessionListener : public IAttachment
     {
     public:
+        using session_req_t =
+            protocols::proto_session_lstnr::SessionReq<
+            protocols::ZeroBased>;
         typedef std::function<void(const char*, size_t)>
             data_received_handler_t;
         typedef std::function<void(std::unique_ptr<Session>&&)>
@@ -41,8 +44,7 @@ namespace lotus::core
             const char* data,
             size_t length) noexcept;
         void _ensure_tmp_pack_data_container();
-        void _new_session(
-            const protocols::proto_session_lstnr::SessionReq& req);
+        void _new_session(const session_req_t& req);
 
     private:
         IConnection* _conn;

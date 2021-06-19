@@ -114,12 +114,12 @@ namespace lotus::core
             SessionReq req;
             if (!req.unpack(data, length))
                 return false;
-            if (req.request_id != SessionReq::REQ_ID)
+            if (req.request_id != session_req_t::REQ_ID)
                 return false;
 
             switch(req.intention)
             {
-            case SessionReq::intention_e::new_session:
+            case session_req_t::Intention::new_session:
                 _new_session(req);
                 break;
 
@@ -139,8 +139,7 @@ namespace lotus::core
         _tmp_pack_data.resize(_tmp_pack_length);
     }
 
-    void SessionListener::_new_session(
-        const protocols::proto_session_lstnr::SessionReq& req)
+    void SessionListener::_new_session(const session_req_t& req)
     {
         // create session
         auto sid = ++_last_sid;

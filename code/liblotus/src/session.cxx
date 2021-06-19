@@ -47,8 +47,7 @@ namespace lotus::core
         _send_req(req);
     }
 
-    void Session::_send_req(
-        protocols::proto_session_lstnr::SessionReq& req) noexcept
+    void Session::_send_req(session_req_t& req) noexcept
     {
         assert(_conn != nullptr);
 
@@ -56,19 +55,16 @@ namespace lotus::core
         _conn->write(package.data(), package.length());
     }
 
-    void Session::_ensure_nsrs(
-        protocols::proto_session_lstnr::SessionReq& req) noexcept
+    void Session::_ensure_nsrs(session_req_t& req) noexcept
     {
-        using namespace protocols::proto_session_lstnr;
         switch (_nsrs_state)
         {
         case new_session_req_state_e::not_sent:
-            req.intention = SessionReq::intention_e::new_session;
+            req.intention = session_req_t::Intention::new_session;
             break;
-
-        case new_session_req_state_e::wait_for_rsp: [[fallthrough]];
+        case new_session_req_state_e::wait_for_rsp:
         case new_session_req_state_e::remote_acked:
-            req.intention = SessionReq::intention_e::session_data;
+            req.intention = session_req_t::Intention::session_data;
             break;
         }
     }

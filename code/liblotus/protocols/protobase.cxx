@@ -3,162 +3,275 @@
 
 namespace lotus::core::protocols
 {
-    // ProtocolPackage ----------------------------------------------
-    
-    ProtocolPackage::ProtocolPackage() noexcept
-        : _data({0, 0}) // use the first 2 bytes to store length
+    namespace utils
+    {
+        template<typename T>
+        inline T msgpack_obj_as(void* native_obj_handle)
+        {
+            using namespace msgpack;
+            try
+            {
+                auto oh =
+                    static_cast<object_handle*>(native_obj_handle);
+                const auto& o = oh->get();
+                return o.as<T>();
+            }
+            catch (unpack_error)
+            {
+                throw UnpackError();
+            }
+            catch (type_error)
+            {
+                throw UnpackError();
+            }
+        }
+    }
+
+    // UnpackError --------------------------------------------------
+    UnpackError::UnpackError()
+        : std::runtime_error("Unpacking protocol data failed")
     {}
 
-    ProtocolPackage::~ProtocolPackage() noexcept
+    // Package ------------------------------------------------------
+    Package::Package() noexcept
+        : _native_stream(new msgpack::sbuffer())
+    {
+        static constexpr char fixed_header[] = { 0, 0 };
+        auto s = static_cast<msgpack::sbuffer*>(_native_stream);
+        s->write(fixed_header, FIXED_HEADER_LENGTH);
+    }
+
+    Package::Package(Package&& rhs) noexcept
+        : _native_stream(std::move(rhs._native_stream))
     {}
 
-    size_t ProtocolPackage::length() noexcept
+    Package::~Package() noexcept
     {
-        return _data.size();
+        delete static_cast<msgpack::sbuffer*>(_native_stream);
     }
 
-    size_t ProtocolPackage::payload_length() noexcept
+    Package& Package::operator=(Package&& rhs) noexcept
     {
-        return _data.size() - fixed_header_len;
+        _native_stream = std::move(rhs._native_stream);
+        return *this;
     }
 
-    const char* ProtocolPackage::data() noexcept
+    void* Package::native_stream() const noexcept
     {
-        return _data.data();
+        return _native_stream;
     }
 
-    void ProtocolPackage::append(
-        const char* data,
-        size_t length) noexcept
+    void Package::refresh_header() noexcept
     {
-        _data.insert(_data.end(), data, data + length);
-        const auto payload_len =
-            _data.size()
-            - fixed_header_len;
-        const auto masked_payload_len =
-            payload_len & 0x0000ffff;
-        _data[0] = static_cast<char>(masked_payload_len & 0x00ff);
-        _data[1] = static_cast<char>(masked_payload_len >> 8);
+        auto s = static_cast<msgpack::sbuffer*>(_native_stream);
+        const size_t payload_len = s->size() - FIXED_HEADER_LENGTH;
+        const uint16_t masked_payload_len = payload_len & 0x0000ffff;
+
+        char* buf = s->data();
+        buf[0] = static_cast<char>(masked_payload_len & 0x00ff);
+        buf[1] = static_cast<char>(masked_payload_len >> 8);
+    }
+
+    const char* Package::data() const noexcept
+    {
+        auto s = static_cast<msgpack::sbuffer*>(_native_stream);
+        return s->data();
+    }
+
+    size_t Package::length() const noexcept
+    {
+        auto s = static_cast<msgpack::sbuffer*>(_native_stream);
+        return s->size();
+    }
+
+    // Packer -------------------------------------------------------
+    Packer::Packer() noexcept
+        : _native_pac(nullptr)
+    {
+        using namespace msgpack;
+        auto pac = new packer<sbuffer>(
+            static_cast<sbuffer*>(_package.native_stream()));
+        _native_pac = pac;
+    }
+
+    Packer::Packer(Packer&& rhs) noexcept
+        : _native_pac(std::move(rhs._native_pac))
+        , _package(std::move(rhs._package))
+    {}
+
+    Packer::~Packer() noexcept
+    {
+        using namespace msgpack;
+        delete static_cast<packer<sbuffer>*>(_native_pac);
+    }
+
+    Packer& Packer::operator=(Packer&& rhs) noexcept
+    {
+        _native_pac = std::move(rhs._native_pac);
+        _package = std::move(rhs._package);
+        return *this;
+    }
+
+    void Packer::pack_int32(int32_t val)
+    {
+        auto pac =
+            static_cast<msgpack::packer<msgpack::sbuffer>*>(
+                _native_pac);
+        pac->pack_int32(val);
+    }
+
+    void Packer::pack_uint32(uint32_t val)
+    {
+        auto pac =
+            static_cast<msgpack::packer<msgpack::sbuffer>*>(
+                _native_pac);
+        pac->pack_uint32(val);
+    }
+
+    void Packer::pack_blob(const std::vector<char>& blob)
+    {
+        auto pac =
+            static_cast<msgpack::packer<msgpack::sbuffer>*>(
+                _native_pac);
+
+        uint32_t blen = static_cast<uint32_t>(blob.size());
+        assert(blen <= std::numeric_limits<uint16_t>::max());
+        pac->pack_bin(blen);
+        if(blen > 0)
+        {
+            pac->pack_bin_body(blob.data(), blen);
+        }
+    }
+
+    Package& Packer::result()
+    {
+        return _package;
+    }
+
+    // Unpacker -----------------------------------------------------
+    Unpacker::Unpacker() noexcept
+        : _native_pac(new msgpack::unpacker())
+        , _native_obj_handle(new msgpack::object_handle())
+    {}
+
+    Unpacker::Unpacker(const char* data, size_t length) noexcept
+    {
+        consume(data, length);
+    }
+
+    Unpacker::Unpacker(Unpacker&& rhs) noexcept
+        : _native_pac(std::move(rhs._native_pac))
+        , _native_obj_handle(std::move(rhs._native_obj_handle))
+    {}
+
+    Unpacker::~Unpacker() noexcept
+    {
+        using namespace msgpack;
+        delete static_cast<object_handle*>(_native_obj_handle);
+        delete static_cast<unpacker*>(_native_pac);
+    }
+
+    Unpacker& Unpacker::operator=(Unpacker&& rhs) noexcept
+    {
+        _native_pac = std::move(rhs._native_pac);
+        _native_obj_handle = std::move(rhs._native_obj_handle);
+        return *this;
+    }
+
+    void Unpacker::consume(const char* data, size_t length) noexcept
+    {
+        auto pac = static_cast<msgpack::unpacker*>(_native_pac);
+        pac->reserve_buffer(length);
+        memcpy(pac->buffer(), data, length);
+        pac->buffer_consumed(length);
+    }
+
+    bool Unpacker::next() noexcept
+    {
+        using namespace msgpack;
+        auto pac = static_cast<unpacker*>(_native_pac);
+        auto oh = static_cast<object_handle*>(_native_obj_handle);
+        return pac->next(*oh);
+    }
+
+    size_t Unpacker::parsed_size() const noexcept
+    {
+        auto pac = static_cast<msgpack::unpacker*>(_native_pac);
+        return pac->parsed_size();
+    }
+
+    int32_t Unpacker::to_int32() const
+    {
+        return utils::msgpack_obj_as<int32_t>(_native_obj_handle);
+    }
+
+    uint32_t Unpacker::to_uint32() const
+    {
+        return utils::msgpack_obj_as<uint32_t>(_native_obj_handle);
+    }
+
+    void Unpacker::to_blob(std::vector<char>& out) const
+    {
+        using namespace msgpack;
+        auto oh = static_cast<object_handle*>(_native_obj_handle);
+        const auto& o = oh->get();
+        if (o.type != type::BIN)
+            throw UnpackError();
+        if(o.via.bin.size >=
+            std::numeric_limits<uint32_t>::max())
+            throw UnpackError();
+        o >> out;
     }
 
     // ProtocolBase -------------------------------------------------
-    ProtocolPackage ProtocolBase::pack() noexcept
+    ProtocolBase::ProtocolBase() noexcept
+        : proto_type(ProtocolType::unknown)
+    {}
+
+    ProtocolBase::ProtocolBase(ProtocolBase&& rhs) noexcept
+        : proto_type(std::move(rhs.proto_type))
+    {}
+
+    ProtocolBase& ProtocolBase::operator=(ProtocolBase&& rhs) noexcept
     {
-        ProtocolPackage result;
-        on_packing(result);
-        return result;
+        proto_type = std::move(rhs.proto_type);
+        return *this;
     }
 
-    bool ProtocolBase::unpack(
+    Package ProtocolBase::pack() noexcept
+    {
+        Packer pac;
+        on_packing(pac);
+        auto& ret = pac.result();
+        ret.refresh_header();
+        return std::move(ret);
+    }
+
+    size_t ProtocolBase::unpack(
         const char* data,
         size_t length) noexcept
     {
-        msgpack::unpacker pac;
-        pac.reserve_buffer(length);
-        memcpy(pac.buffer(), data, length);
-        pac.buffer_consumed(length);
-
-        return on_unpacking(&pac);
+        Unpacker pac(data, length);
+        return on_unpacking(pac);
     }
 
-    // ProtocolRequest ----------------------------------------------
-    ProtocolRequest::ProtocolRequest() noexcept
-        : request_id(0)
-        , trx_id(0)
-    {}
-
-    ProtocolRequest::~ProtocolRequest() noexcept
-    {}
-
-    void ProtocolRequest::on_packing(ProtocolPackage& data) noexcept
+    void ProtocolBase::on_packing(Packer& pac) noexcept
     {
-        //TODO: optimize this part into a zero-copy way in future
-        msgpack::sbuffer buf;
-        msgpack::packer pkr(&buf);
-
-        pkr.pack(request_id);
-        pkr.pack(trx_id);
-
-        data.append(buf.data(), buf.size());
+        pac.pack_int32(static_cast<int32_t>(proto_type));
     }
 
-    bool ProtocolRequest::on_unpacking(void* native_pac) noexcept
+    size_t ProtocolBase::on_unpacking(Unpacker& pac) noexcept
     {
-        auto pac = static_cast<msgpack::unpacker*>(native_pac);
-        msgpack::object_handle objh;
-
         try
         {
-            // unpack request_id
-            if (!pac->next(objh))
-                return false;
-
-            const auto& msg_reqid = objh.get();
-            msg_reqid.convert(request_id);
-
-            // unpack trx_id
-            if (!pac->next(objh))
-                return false;
-
-            const auto& msg_trxid = objh.get();
-            msg_trxid.convert(trx_id);
+            if (pac.next())
+                proto_type = static_cast<ProtocolType>(pac.to_int32());
+            return pac.parsed_size();
         }
-        catch(msgpack::unpack_error uex)
+        catch (UnpackError)
         {
-            return false;
+            return UNPACK_ERROR;
         }
-
-        return true;
-    }
-
-    // ProtocolResponse ---------------------------------------------
-
-    ProtocolResponse::ProtocolResponse() noexcept
-        : result_code(0)
-        , trx_id(0)
-    {}
-
-    ProtocolResponse::~ProtocolResponse() noexcept
-    {}
-
-    void ProtocolResponse::on_packing(ProtocolPackage& data) noexcept
-    {
-        // TODO: optimize this part into a zero-copy way in future
-        msgpack::sbuffer buf;
-        msgpack::packer pkr(&buf);
-
-        pkr.pack(result_code);
-        pkr.pack(trx_id);
-
-        data.append(buf.data(), buf.size());
-    }
-
-    bool ProtocolResponse::on_unpacking(void* native_pac) noexcept
-    {
-        auto pac = static_cast<msgpack::unpacker*>(native_pac);
-        msgpack::object_handle objh;
-
-        try
-        {
-            // unpack result_code
-            if (!pac->next(objh))
-                return false;
-
-            const auto& msg_rescode = objh.get();
-            msg_rescode.convert(result_code);
-
-            // unpack trx_id
-            if (!pac->next(objh))
-                return false;
-
-            const auto& msg_trxid = objh.get();
-            msg_trxid.convert(trx_id);
-        }
-        catch(msgpack::unpack_error uex)
-        {
-            return false;
-        }
-        return true;
     }
 } // namespace lotus::core::protocols
 

@@ -1,78 +1,275 @@
 #ifndef LOTUS_PROTOBASE_H
 #define LOTUS_PROTOBASE_H
 
+#include <stdexcept>
 #include <vector>
 
 namespace lotus::core::protocols
 {
-    class ProtocolPackage final
+    class UnpackError : public std::runtime_error
     {
     public:
-        static constexpr size_t fixed_header_len = 2;
+        UnpackError();
+        UnpackError(const UnpackError&) = default;
+        UnpackError(UnpackError&&) = default;
+    };
+
+    class Package final
+    {
+    public:
+        static constexpr size_t FIXED_HEADER_LENGTH = 2;
 
     public:
-        ProtocolPackage() noexcept;
-        ~ProtocolPackage() noexcept;
-        ProtocolPackage(const ProtocolPackage&) = default;
-        ProtocolPackage(ProtocolPackage&&) = default;
-        ProtocolPackage& operator=(const ProtocolPackage&) = default;
-        ProtocolPackage& operator=(ProtocolPackage&&) = default;
+        Package() noexcept;
+        Package(const Package&) = delete;
+        Package(Package&& rhs) noexcept;
+        ~Package() noexcept;
+
+        Package& operator=(const Package&) = delete;
+        Package& operator=(Package&& rhs) noexcept;
 
     public:
-        size_t length() noexcept;
-        size_t payload_length() noexcept;
-        const char* data() noexcept;
-        void append(const char* data, size_t length) noexcept;
+        void* native_stream() const noexcept;
+        void refresh_header() noexcept;
+        const char* data() const noexcept;
+        size_t length() const noexcept;
+        
+    private:
+        void* _native_stream;
+    };
+
+    class Packer final
+    {
+    public:
+        Packer() noexcept;
+        Packer(const Packer&) = delete;
+        Packer(Packer&& rhs) noexcept;
+        ~Packer() noexcept;
+
+        Packer& operator=(const Packer&) = delete;
+        Packer& operator=(Packer&& rhs) noexcept;
+
+    public:
+        Package& result();
+        void pack_int32(int32_t val);
+        void pack_uint32(uint32_t val);
+        void pack_blob(const std::vector<char>& blob);
 
     private:
-        std::vector<char> _data;
+        Package _package;
+        void* _native_pac;
     };
 
-    class ProtocolBase
+    class Unpacker final
     {
     public:
-        ProtocolPackage pack() noexcept;
-        bool unpack(const char* data, size_t length) noexcept;
+        Unpacker() noexcept;
+        Unpacker(const char* data, size_t length) noexcept;
+        Unpacker(const Unpacker&) = delete;
+        Unpacker(Unpacker&& rhs) noexcept;
+        ~Unpacker() noexcept;
+
+        Unpacker& operator=(const Unpacker&) = delete;
+        Unpacker& operator=(Unpacker&& rhs) noexcept;
 
     public:
+        void consume(const char* data, size_t length) noexcept;
+        bool next() noexcept;
+        size_t parsed_size() const noexcept;
+
+        int32_t to_int32() const;
+        uint32_t to_uint32() const;
+        void to_blob(std::vector<char>& out) const;
+
+    private:
+        void* _native_pac;
+        void* _native_obj_handle;
+    };
+
+    struct ProtocolBase
+    {
+        static constexpr size_t UNPACK_ERROR = -1;
+
+        enum class ProtocolType : int32_t
+        {
+            unknown = 0,
+            request = 1,
+            response = 2,
+            notification = 3
+        } proto_type;
+
+        ProtocolBase() noexcept;
+        ProtocolBase(const ProtocolBase&) = delete;
+        ProtocolBase(ProtocolBase&& rhs) noexcept;
+        ProtocolBase& operator=(const ProtocolBase&) = delete;
+        ProtocolBase& operator=(ProtocolBase&& rhs) noexcept;
+
+        Package pack() noexcept;
+        size_t unpack(const char* data, size_t length) noexcept;
+
         virtual ~ProtocolBase() noexcept {};
-        virtual void on_packing(ProtocolPackage& data) noexcept = 0;
-        virtual bool on_unpacking(void* native_pac) noexcept = 0;
+        virtual void on_packing(Packer& pac) noexcept;
+        virtual size_t on_unpacking(Unpacker& pac) noexcept;
     };
 
-    struct ProtocolRequest : public ProtocolBase
+    struct ZeroBased
+    {};
+
+    template<typename BaseProto = ZeroBased>
+    struct ProtocolRequest
+    {};
+
+    template<>
+    struct ProtocolRequest<ProtocolBase> : public ProtocolBase
     {
-        int32_t request_id;
+        uint32_t request_id;
         uint32_t trx_id;
 
-        ProtocolRequest() noexcept;
-        virtual ~ProtocolRequest() noexcept;
+        ProtocolRequest(ProtocolBase&& base) noexcept
+            : ProtocolBase(std::move(base))
+            , request_id(0)
+            , trx_id(0)
+        {}
+
+        virtual ~ProtocolRequest() noexcept
+        {}
 
         ProtocolRequest(const ProtocolRequest&) = default;
         ProtocolRequest(ProtocolRequest&&) = default;
         ProtocolRequest& operator=(const ProtocolRequest&) = default;
         ProtocolRequest& operator=(ProtocolRequest&&) = default;
 
-        virtual void on_packing(
-            ProtocolPackage& data) noexcept override;
-        virtual bool on_unpacking(void* native_pac) noexcept override;
+        virtual void on_packing(Packer& pac) noexcept override
+        {
+            pac.pack_uint32(request_id);
+            pac.pack_uint32(trx_id);
+        }
+
+        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        {
+            try
+            {
+                if (!pac.next())
+                    return pac.parsed_size();
+                request_id = pac.to_uint32();
+
+                if (!pac.next())
+                    return pac.parsed_size();
+                trx_id = pac.to_uint32();
+
+                return pac.parsed_size();
+            }
+            catch (UnpackError)
+            {
+                return UNPACK_ERROR;
+            }
+        }
     };
 
-    struct ProtocolResponse : public ProtocolBase
+    template<>
+    struct ProtocolRequest<ZeroBased>
+        : public ProtocolRequest<ProtocolBase>
     {
+        ProtocolRequest() noexcept
+            : ProtocolRequest<ProtocolBase>(ProtocolBase())
+        {
+            proto_type = ProtocolType::request;
+        }
+
+        virtual void on_packing(Packer& pac) noexcept override
+        {
+            ProtocolBase::on_packing(pac);
+            ProtocolRequest<ProtocolBase>::on_packing(pac);
+        }
+        
+        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        {
+            if (ProtocolBase::on_unpacking(pac) == UNPACK_ERROR)
+                return UNPACK_ERROR;
+            return ProtocolRequest<ProtocolBase>::on_unpacking(pac);
+        }
+    };
+
+    template<typename BaseProto = ZeroBased>
+    struct ProtocolResponse
+    {};
+
+    template<>
+    struct ProtocolResponse<ProtocolBase> : public ProtocolBase
+    {
+        uint32_t response_id;
         int32_t result_code;
         uint32_t trx_id;
 
-        ProtocolResponse() noexcept;
-        virtual ~ProtocolResponse() noexcept;
+        ProtocolResponse(ProtocolBase&& base) noexcept
+            : ProtocolBase(std::move(base))
+            , response_id(0)
+            , result_code(0)
+            , trx_id(0)
+        {}
+
+        virtual ~ProtocolResponse() noexcept
+        {}
+
         ProtocolResponse(const ProtocolResponse&) = default;
         ProtocolResponse(ProtocolResponse&&) = default;
         ProtocolResponse& operator=(const ProtocolResponse&) = default;
         ProtocolResponse& operator=(ProtocolResponse&&) = default;
 
-        virtual void on_packing(
-            ProtocolPackage& data) noexcept override;
-        virtual bool on_unpacking(void* native_pac) noexcept override;
+        virtual void on_packing(Packer& pac) noexcept override
+        {
+            pac.pack_uint32(response_id);
+            pac.pack_int32(result_code);
+            pac.pack_uint32(trx_id);
+        }
+
+        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        {
+            try
+            {
+                if (!pac.next())
+                    return pac.parsed_size();
+                response_id = pac.to_uint32();
+
+                if (!pac.next())
+                    return pac.parsed_size();
+                result_code = pac.to_int32();
+
+                if (!pac.next())
+                    return pac.parsed_size();
+                trx_id = pac.to_uint32();
+
+                return pac.parsed_size();
+            }
+            catch(UnpackError)
+            {
+                return UNPACK_ERROR;
+            }
+        }
+    };
+
+    template<>
+    struct ProtocolResponse<ZeroBased>
+        : public ProtocolResponse<ProtocolBase>
+    {
+        ProtocolResponse() noexcept
+            : ProtocolResponse<ProtocolBase>(ProtocolBase())
+        {
+            proto_type = ProtocolType::response;
+        }
+
+        virtual void on_packing(Packer& pac) noexcept override
+        {
+            ProtocolBase::on_packing(pac);
+            ProtocolResponse<ProtocolBase>::on_packing(pac);
+        }
+
+        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        {
+            if (ProtocolBase::on_unpacking(pac) == UNPACK_ERROR)
+                return UNPACK_ERROR;
+            return ProtocolResponse<ProtocolBase>::on_unpacking(pac);
+        }
     };
 }
 
