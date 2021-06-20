@@ -40,6 +40,8 @@ set(LIBLOTUS_SOURCE_FILES
 set(LIBLOTUS_PROTOCOL_FILES
     protocols/protobase.cxx
     protocols/protobase.hxx
+    protocols/protolstnr.cxx
+    protocols/protolstnr.hxx
     protocols/proto-session-lstnr.hxx
 )
 

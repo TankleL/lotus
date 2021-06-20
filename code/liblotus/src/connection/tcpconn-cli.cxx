@@ -70,7 +70,9 @@ namespace lotus::core::connection
             std::static_pointer_cast<uvw::TCPHandle>(_tcp_handle);
         if(tcp->writable())
         {
-            tcp->write(const_cast<char*>(data), length);
+            tcp->write(
+                const_cast<char*>(data),
+                static_cast<unsigned int>(length));
             return length;
         }
         else

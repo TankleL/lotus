@@ -14,19 +14,19 @@ namespace lotus::core::protocols
         UnpackError(UnpackError&&) = default;
     };
 
-    class Package final
+    class PackedPackage final
     {
     public:
         static constexpr size_t FIXED_HEADER_LENGTH = 2;
 
     public:
-        Package() noexcept;
-        Package(const Package&) = delete;
-        Package(Package&& rhs) noexcept;
-        ~Package() noexcept;
+        PackedPackage() noexcept;
+        PackedPackage(const PackedPackage&) = delete;
+        PackedPackage(PackedPackage&& rhs) noexcept;
+        ~PackedPackage() noexcept;
 
-        Package& operator=(const Package&) = delete;
-        Package& operator=(Package&& rhs) noexcept;
+        PackedPackage& operator=(const PackedPackage&) = delete;
+        PackedPackage& operator=(PackedPackage&& rhs) noexcept;
 
     public:
         void* native_stream() const noexcept;
@@ -50,13 +50,13 @@ namespace lotus::core::protocols
         Packer& operator=(Packer&& rhs) noexcept;
 
     public:
-        Package& result();
+        PackedPackage& result();
         void pack_int32(int32_t val);
         void pack_uint32(uint32_t val);
         void pack_blob(const std::vector<char>& blob);
 
     private:
-        Package _package;
+        PackedPackage _package;
         void* _native_pac;
     };
 
@@ -104,7 +104,7 @@ namespace lotus::core::protocols
         ProtocolBase& operator=(const ProtocolBase&) = delete;
         ProtocolBase& operator=(ProtocolBase&& rhs) noexcept;
 
-        Package pack() noexcept;
+        PackedPackage pack() noexcept;
         size_t unpack(const char* data, size_t length) noexcept;
 
         virtual ~ProtocolBase() noexcept {};

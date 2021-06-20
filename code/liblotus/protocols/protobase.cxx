@@ -32,8 +32,8 @@ namespace lotus::core::protocols
         : std::runtime_error("Unpacking protocol data failed")
     {}
 
-    // Package ------------------------------------------------------
-    Package::Package() noexcept
+    // PackedPackage ------------------------------------------------------
+    PackedPackage::PackedPackage() noexcept
         : _native_stream(new msgpack::sbuffer())
     {
         static constexpr char fixed_header[] = { 0, 0 };
@@ -41,27 +41,27 @@ namespace lotus::core::protocols
         s->write(fixed_header, FIXED_HEADER_LENGTH);
     }
 
-    Package::Package(Package&& rhs) noexcept
+    PackedPackage::PackedPackage(PackedPackage&& rhs) noexcept
         : _native_stream(std::move(rhs._native_stream))
     {}
 
-    Package::~Package() noexcept
+    PackedPackage::~PackedPackage() noexcept
     {
         delete static_cast<msgpack::sbuffer*>(_native_stream);
     }
 
-    Package& Package::operator=(Package&& rhs) noexcept
+    PackedPackage& PackedPackage::operator=(PackedPackage&& rhs) noexcept
     {
         _native_stream = std::move(rhs._native_stream);
         return *this;
     }
 
-    void* Package::native_stream() const noexcept
+    void* PackedPackage::native_stream() const noexcept
     {
         return _native_stream;
     }
 
-    void Package::refresh_header() noexcept
+    void PackedPackage::refresh_header() noexcept
     {
         auto s = static_cast<msgpack::sbuffer*>(_native_stream);
         const size_t payload_len = s->size() - FIXED_HEADER_LENGTH;
@@ -72,13 +72,13 @@ namespace lotus::core::protocols
         buf[1] = static_cast<char>(masked_payload_len >> 8);
     }
 
-    const char* Package::data() const noexcept
+    const char* PackedPackage::data() const noexcept
     {
         auto s = static_cast<msgpack::sbuffer*>(_native_stream);
         return s->data();
     }
 
-    size_t Package::length() const noexcept
+    size_t PackedPackage::length() const noexcept
     {
         auto s = static_cast<msgpack::sbuffer*>(_native_stream);
         return s->size();
@@ -143,7 +143,7 @@ namespace lotus::core::protocols
         }
     }
 
-    Package& Packer::result()
+    PackedPackage& Packer::result()
     {
         return _package;
     }
@@ -238,7 +238,7 @@ namespace lotus::core::protocols
         return *this;
     }
 
-    Package ProtocolBase::pack() noexcept
+    PackedPackage ProtocolBase::pack() noexcept
     {
         Packer pac;
         on_packing(pac);
