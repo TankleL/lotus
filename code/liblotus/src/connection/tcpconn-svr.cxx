@@ -5,7 +5,6 @@
 namespace lotus::core::connection
 {
     // TCPConnectionListener ----------------------------------------
-
     TCPConnectionListener::TCPConnectionListener(STALoop* loop)
         : _loop(loop)
     {}
@@ -53,9 +52,9 @@ namespace lotus::core::connection
         client->on<uvw::DataEvent>([connection = conn.get()]
         (const uvw::DataEvent& de, uvw::TCPHandle& tcp) {
             bool close_conn = false;
-            if(connection->on_data_received != nullptr)
+            if(connection->on_read != nullptr)
             {
-                close_conn = !connection->on_data_received(
+                close_conn = !connection->on_read(
                     *connection,
                     de.data.get(),
                     de.length);
@@ -73,14 +72,6 @@ namespace lotus::core::connection
 
         tcp_svr->accept(*client);
         return std::move(conn);
-    }
-
-    void TCPServerSideConnection::read()
-    {
-        const auto& tcp =
-            std::static_pointer_cast<uvw::TCPHandle>(
-                _tcp_client_handle);
-        tcp->read();
     }
 
     void TCPServerSideConnection::close() noexcept
