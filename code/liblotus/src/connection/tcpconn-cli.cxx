@@ -1,7 +1,7 @@
 #include <cassert>
 
 #include "connstr.hxx"
-#include "session-lstnr.hxx"
+#include "protolstnr.hxx"
 #include "staloop-intl.hxx"
 #include "tcpconn-cli.hxx"
 #include "proto-session-lstnr.hxx"
@@ -39,7 +39,7 @@ namespace lotus::core::connection
         (const uvw::ConnectEvent& ce, uvw::TCPHandle& tcp)
         {
             _is_connected = true;
-            SessionListener::bind(this);
+            protocols::ProtoListener::bind(this);
             cb(this);
         });
 

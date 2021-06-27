@@ -5,6 +5,9 @@
 
 namespace lotus::core
 {
+    namespace pt = protocols;
+    namespace pts = protocols::proto_session;
+
     Session::Session(IConnection* conn) noexcept
         : _id(0)
         , _conn(conn)
@@ -23,8 +26,7 @@ namespace lotus::core
             length > 0 &&
             length <= std::numeric_limits<uint32_t>::max());
 
-        using namespace protocols::proto_session_lstnr;
-        SessionReq req;
+        pts::SessionReq<pt::ZeroBased> req;
         _ensure_nsrs(req);
 
         req.payload.resize(length);
@@ -39,8 +41,7 @@ namespace lotus::core
             data.size() > 0 &&
             data.size() <= std::numeric_limits<uint32_t>::max());
 
-        using namespace protocols::proto_session_lstnr;
-        SessionReq req;
+        pts::SessionReq<pt::ZeroBased> req;
         _ensure_nsrs(req);
         req.payload = std::move(data);
 
@@ -57,16 +58,16 @@ namespace lotus::core
 
     void Session::_ensure_nsrs(session_req_t& req) noexcept
     {
-        switch (_nsrs_state)
-        {
-        case new_session_req_state_e::not_sent:
-            req.intention = session_req_t::Intention::new_session;
-            break;
-        case new_session_req_state_e::wait_for_rsp:
-        case new_session_req_state_e::remote_acked:
-            req.intention = session_req_t::Intention::session_data;
-            break;
-        }
+        //switch (_nsrs_state)
+        //{
+        //case new_session_req_state_e::not_sent:
+        //    req.intention = session_req_t::Intention::new_session;
+        //    break;
+        //case new_session_req_state_e::wait_for_rsp:
+        //case new_session_req_state_e::remote_acked:
+        //    req.intention = session_req_t::Intention::session_data;
+        //    break;
+        //}
     }
 }
 

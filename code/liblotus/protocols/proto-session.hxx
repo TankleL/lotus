@@ -4,11 +4,10 @@
 #include "uuid.hxx"
 #include "protobase.hxx"
 
-namespace lotus::core::protocols::proto_session_lstnr
+namespace lotus::core::protocols::proto_session
 {
     template<typename BaseProto = ZeroBased>
-    struct SessionReq
-    {};
+    struct SessionReq;
 
     template<>
     struct SessionReq<ProtocolRequest<ProtocolBase>>
@@ -18,9 +17,9 @@ namespace lotus::core::protocols::proto_session_lstnr
         enum class Intention : int32_t
         {
             bad_intention= 0,
-            new_session= 1,
-            session_data = 2,
-            abort_session = 3
+            begin_session= 1,
+            end_session = 2,
+            session_data = 3,
         } intention;
         std::vector<char> payload;
 
@@ -37,23 +36,16 @@ namespace lotus::core::protocols::proto_session_lstnr
             pac.pack_blob(payload);
         }
 
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
-            try
-            {
-                if (!pac.next())
-                    return pac.parsed_size();
-                intention = static_cast<Intention>(pac.to_int32());
-                
-                if (!pac.next())
-                    return pac.parsed_size();
-                pac.to_blob(payload);
+            if (!pac.next())
                 return pac.parsed_size();
-            }
-            catch (UnpackError)
-            {
-                return UNPACK_ERROR;
-            }
+            intention = static_cast<Intention>(pac.to_int32());
+            
+            if (!pac.next())
+                return pac.parsed_size();
+            pac.to_blob(payload);
+            return pac.parsed_size();
         }
     };
 
@@ -76,22 +68,19 @@ namespace lotus::core::protocols::proto_session_lstnr
                 ::on_packing(pac);
         }
 
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
-            if (ProtocolBase::on_unpacking(pac) == UNPACK_ERROR)
-                return UNPACK_ERROR;
-            if (SessionReq<ProtocolRequest<ProtocolBase>>
+            ProtocolBase::on_unpacking(pac);
+            SessionReq<ProtocolRequest<ProtocolBase>>
                 ::ProtocolRequest
-                ::on_unpacking(pac) == UNPACK_ERROR)
-                return UNPACK_ERROR;
+                ::on_unpacking(pac);
             return SessionReq<ProtocolRequest<ProtocolBase>>
                 ::on_unpacking(pac);
         }
     };
 
     template<typename BaseProto = ZeroBased>
-    struct SessionRsp
-    {};
+    struct SessionRsp;
 
     template<>
     struct SessionRsp<ProtocolResponse<ProtocolBase>>
@@ -112,7 +101,7 @@ namespace lotus::core::protocols::proto_session_lstnr
             pac.pack_uint32(session_id);
         }
 
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
             try
             {
@@ -147,7 +136,7 @@ namespace lotus::core::protocols::proto_session_lstnr
                 ::on_packing(pac);
         }
 
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
             if (ProtocolBase::on_unpacking(pac) == UNPACK_ERROR)
                 return UNPACK_ERROR;
@@ -159,7 +148,7 @@ namespace lotus::core::protocols::proto_session_lstnr
                 ::on_unpacking(pac);
         }
     };
-} // namespace lotus::core::protocols::proto_session_lstnr
+} // namespace lotus::core::protocols::proto_session
 
 #endif // !LOTUS_PROTO_SESSION_LSTNR_H
 

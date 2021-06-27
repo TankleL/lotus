@@ -247,9 +247,7 @@ namespace lotus::core::protocols
         return std::move(ret);
     }
 
-    size_t ProtocolBase::unpack(
-        const char* data,
-        size_t length) noexcept
+    size_t ProtocolBase::unpack(const char* data,size_t length)
     {
         Unpacker pac(data, length);
         return on_unpacking(pac);
@@ -260,18 +258,11 @@ namespace lotus::core::protocols
         pac.pack_int32(static_cast<int32_t>(proto_type));
     }
 
-    size_t ProtocolBase::on_unpacking(Unpacker& pac) noexcept
+    size_t ProtocolBase::on_unpacking(Unpacker& pac)
     {
-        try
-        {
-            if (pac.next())
-                proto_type = static_cast<ProtocolType>(pac.to_int32());
-            return pac.parsed_size();
-        }
-        catch (UnpackError)
-        {
-            return UNPACK_ERROR;
-        }
+        if (pac.next())
+            proto_type = static_cast<ProtocolType>(pac.to_int32());
+        return pac.parsed_size();
     }
 } // namespace lotus::core::protocols
 

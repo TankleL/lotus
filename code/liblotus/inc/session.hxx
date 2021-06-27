@@ -17,7 +17,7 @@ namespace lotus::core
     {
     public:
         using session_req_t =
-            protocols::proto_session_lstnr::SessionReq<
+            protocols::proto_session::SessionReq<
             protocols::ZeroBased>;
         typedef std::function<void()> recv_callback_t;
 

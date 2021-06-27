@@ -6,6 +6,7 @@
 
 #include "attachable.hxx"
 #include "conn.hxx"
+#include "protobase.hxx"
 
 namespace lotus::core::protocols
 {
@@ -40,7 +41,10 @@ namespace lotus::core::protocols
             bool(ProtocolRequest<ProtocolBase>&& req,
                 ListenedPackage&& pack,
                 size_t offset)> req_callback_t;
-        typedef std::function<bool(void)> rsp_callback_t;
+        typedef std::function<
+            bool(ProtocolResponse<ProtocolBase>&& rsp,
+                ListenedPackage&& pack,
+                size_t offset)> rsp_callback_t;
         typedef std::function<bool(void)> notify_callback_t;
         typedef std::function<bool(void)> unknown_callback_t;
 
@@ -59,6 +63,9 @@ namespace lotus::core::protocols
         void add_request_callback(
             uint32_t req_id,
             const req_callback_t& cb) noexcept;
+        void add_response_callback(
+            uint32_t rsp_id,
+            const rsp_callback_t& cb) noexcept;
 
     private:
         void _ensure_pack() noexcept;

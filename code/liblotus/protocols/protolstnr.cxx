@@ -70,6 +70,7 @@ namespace lotus::core::protocols
             _buf = new char[size];
             _length = size;
         }
+        return *this;
     }
 
     // ProtoListener ------------------------------------------------
@@ -86,8 +87,8 @@ namespace lotus::core::protocols
     ProtoListener& ProtoListener::bind(IConnection* conn) noexcept
     {
         auto instance = std::make_unique<ProtoListener>();
-        auto* retval = instance.get();
-        retval->_conn = conn;
+        auto& retval = *instance;
+        retval._conn = conn;
         conn->attach(
             conn->ATTID_ProtoListener,
             std::move(instance));
@@ -102,6 +103,21 @@ namespace lotus::core::protocols
             assert(listener != nullptr);
             return listener->parse(data, len);
         };
+        return retval;
+    }
+
+    void ProtoListener::add_request_callback(
+            uint32_t req_id,
+            const req_callback_t& cb) noexcept
+    {
+        _req_map[req_id] = cb;
+    }
+
+    void ProtoListener::add_response_callback(
+            uint32_t rsp_id,
+            const rsp_callback_t& cb) noexcept
+    {
+        _req_map[rsp_id] = cb;
     }
 
     bool ProtoListener::parse(

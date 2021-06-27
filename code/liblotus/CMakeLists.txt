@@ -8,9 +8,10 @@ set(LIBLOTUS_INCLUDE_FILES
     inc/connection/httpconn-svr.hxx
     inc/connection/tcpconn-cli.hxx
     inc/connection/tcpconn-svr.hxx
+    inc/ctxmgr.hxx
     inc/msg.hxx
     inc/session.hxx
-    inc/session-lstnr.hxx
+    inc/sessionmgr.hxx
     inc/staloop.hxx
     inc/uuid.hxx
     inc/vlint.hxx
@@ -27,9 +28,10 @@ set(LIBLOTUS_SOURCE_FILES
     src/connection/tcpconn-cli.cxx
     src/connection/tcpconn-svr.cxx
     src/connstr.cxx
+    src/ctxmgr.cxx
     src/msg.cxx
     src/session.cxx
-    src/session-lstnr.cxx
+    src/sessionmgr.cxx
     src/staloop.cxx
     src/staloop-intl.cxx
     src/uuid.cxx
@@ -42,7 +44,7 @@ set(LIBLOTUS_PROTOCOL_FILES
     protocols/protobase.hxx
     protocols/protolstnr.cxx
     protocols/protolstnr.hxx
-    protocols/proto-session-lstnr.hxx
+    protocols/proto-session.hxx
 )
 
 add_library(lotus_a STATIC

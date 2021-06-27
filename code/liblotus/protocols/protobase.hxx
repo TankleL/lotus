@@ -105,19 +105,17 @@ namespace lotus::core::protocols
         ProtocolBase& operator=(ProtocolBase&& rhs) noexcept;
 
         PackedPackage pack() noexcept;
-        size_t unpack(const char* data, size_t length) noexcept;
+        size_t unpack(const char* data, size_t length);
 
         virtual ~ProtocolBase() noexcept {};
         virtual void on_packing(Packer& pac) noexcept;
-        virtual size_t on_unpacking(Unpacker& pac) noexcept;
+        virtual size_t on_unpacking(Unpacker& pac);
     };
 
-    struct ZeroBased
-    {};
+    struct ZeroBased;
 
     template<typename BaseProto = ZeroBased>
-    struct ProtocolRequest
-    {};
+    struct ProtocolRequest;
 
     template<>
     struct ProtocolRequest<ProtocolBase> : public ProtocolBase
@@ -145,24 +143,17 @@ namespace lotus::core::protocols
             pac.pack_uint32(trx_id);
         }
 
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
-            try
-            {
-                if (!pac.next())
-                    return pac.parsed_size();
-                request_id = pac.to_uint32();
-
-                if (!pac.next())
-                    return pac.parsed_size();
-                trx_id = pac.to_uint32();
-
+            if (!pac.next())
                 return pac.parsed_size();
-            }
-            catch (UnpackError)
-            {
-                return UNPACK_ERROR;
-            }
+            request_id = pac.to_uint32();
+
+            if (!pac.next())
+                return pac.parsed_size();
+            trx_id = pac.to_uint32();
+
+            return pac.parsed_size();
         }
     };
 
@@ -182,17 +173,15 @@ namespace lotus::core::protocols
             ProtocolRequest<ProtocolBase>::on_packing(pac);
         }
         
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
-            if (ProtocolBase::on_unpacking(pac) == UNPACK_ERROR)
-                return UNPACK_ERROR;
+            ProtocolBase::on_unpacking(pac);
             return ProtocolRequest<ProtocolBase>::on_unpacking(pac);
         }
     };
 
     template<typename BaseProto = ZeroBased>
-    struct ProtocolResponse
-    {};
+    struct ProtocolResponse;
 
     template<>
     struct ProtocolResponse<ProtocolBase> : public ProtocolBase
@@ -223,28 +212,21 @@ namespace lotus::core::protocols
             pac.pack_uint32(trx_id);
         }
 
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
-            try
-            {
-                if (!pac.next())
-                    return pac.parsed_size();
-                response_id = pac.to_uint32();
-
-                if (!pac.next())
-                    return pac.parsed_size();
-                result_code = pac.to_int32();
-
-                if (!pac.next())
-                    return pac.parsed_size();
-                trx_id = pac.to_uint32();
-
+            if (!pac.next())
                 return pac.parsed_size();
-            }
-            catch(UnpackError)
-            {
-                return UNPACK_ERROR;
-            }
+            response_id = pac.to_uint32();
+
+            if (!pac.next())
+                return pac.parsed_size();
+            result_code = pac.to_int32();
+
+            if (!pac.next())
+                return pac.parsed_size();
+            trx_id = pac.to_uint32();
+
+            return pac.parsed_size();
         }
     };
 
@@ -264,10 +246,9 @@ namespace lotus::core::protocols
             ProtocolResponse<ProtocolBase>::on_packing(pac);
         }
 
-        virtual size_t on_unpacking(Unpacker& pac) noexcept override
+        virtual size_t on_unpacking(Unpacker& pac) override
         {
-            if (ProtocolBase::on_unpacking(pac) == UNPACK_ERROR)
-                return UNPACK_ERROR;
+            ProtocolBase::on_unpacking(pac);
             return ProtocolResponse<ProtocolBase>::on_unpacking(pac);
         }
     };
