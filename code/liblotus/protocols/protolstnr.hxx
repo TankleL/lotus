@@ -58,7 +58,7 @@ namespace lotus::core::protocols
         ProtoListener& operator=(ProtoListener&&) = default;
 
     public:
-        static ProtoListener& bind(IConnection* conn) noexcept;
+        static ProtoListener& bind(IConnection& conn) noexcept;
         bool parse(const char* data, size_t length) noexcept;
         void add_request_callback(
             uint32_t req_id,

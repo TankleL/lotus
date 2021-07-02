@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "proto-session-lstnr.hxx"
+#include "proto-session.hxx"
 #include "session.hxx"
 
 namespace lotus::core

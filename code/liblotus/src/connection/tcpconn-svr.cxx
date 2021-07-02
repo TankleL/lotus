@@ -1,5 +1,6 @@
 #include "tcpconn-svr.hxx"
 #include "connstr.hxx"
+#include "ctxmgr.hxx"
 #include "protolstnr.hxx"
 #include "staloop-intl.hxx"
 
@@ -14,7 +15,6 @@ namespace lotus::core::connection
         const std::string& connstr) noexcept
     {
         using namespace _internal;
-
         ConnString cs(connstr);
 
         auto l = expose_impl(_loop)->_native_loop();
@@ -22,7 +22,8 @@ namespace lotus::core::connection
         tcp->on<uvw::ListenEvent>([this]
         (const uvw::ListenEvent&, uvw::TCPHandle& svr) {
             auto conn = TCPServerSideConnection::accept(&svr);
-            protocols::ProtoListener::bind(conn.get());
+            protocols::ProtoListener::bind(*conn);
+            ContextManager::bind(*conn);
             if(this->on_create_connection != nullptr)
                 this->on_create_connection(conn);
         });

@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "conn.hxx"
-#include "proto-session-lstnr.hxx"
+#include "proto-session.hxx"
 
 namespace lotus::core
 {

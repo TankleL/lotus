@@ -121,12 +121,12 @@ namespace lotus::core::protocols
     struct ProtocolRequest<ProtocolBase> : public ProtocolBase
     {
         uint32_t request_id;
-        uint32_t trx_id;
+        uint32_t ctx_id;
 
         ProtocolRequest(ProtocolBase&& base) noexcept
             : ProtocolBase(std::move(base))
             , request_id(0)
-            , trx_id(0)
+            , ctx_id(0)
         {}
 
         virtual ~ProtocolRequest() noexcept
@@ -140,7 +140,7 @@ namespace lotus::core::protocols
         virtual void on_packing(Packer& pac) noexcept override
         {
             pac.pack_uint32(request_id);
-            pac.pack_uint32(trx_id);
+            pac.pack_uint32(ctx_id);
         }
 
         virtual size_t on_unpacking(Unpacker& pac) override
@@ -151,7 +151,7 @@ namespace lotus::core::protocols
 
             if (!pac.next())
                 return pac.parsed_size();
-            trx_id = pac.to_uint32();
+            ctx_id = pac.to_uint32();
 
             return pac.parsed_size();
         }
@@ -188,13 +188,13 @@ namespace lotus::core::protocols
     {
         uint32_t response_id;
         int32_t result_code;
-        uint32_t trx_id;
+        uint32_t ctx_id;
 
         ProtocolResponse(ProtocolBase&& base) noexcept
             : ProtocolBase(std::move(base))
             , response_id(0)
             , result_code(0)
-            , trx_id(0)
+            , ctx_id(0)
         {}
 
         virtual ~ProtocolResponse() noexcept
@@ -209,7 +209,7 @@ namespace lotus::core::protocols
         {
             pac.pack_uint32(response_id);
             pac.pack_int32(result_code);
-            pac.pack_uint32(trx_id);
+            pac.pack_uint32(ctx_id);
         }
 
         virtual size_t on_unpacking(Unpacker& pac) override
@@ -224,7 +224,7 @@ namespace lotus::core::protocols
 
             if (!pac.next())
                 return pac.parsed_size();
-            trx_id = pac.to_uint32();
+            ctx_id = pac.to_uint32();
 
             return pac.parsed_size();
         }

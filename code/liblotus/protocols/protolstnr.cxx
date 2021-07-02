@@ -84,15 +84,15 @@ namespace lotus::core::protocols
     ProtoListener::~ProtoListener() noexcept
     {}
 
-    ProtoListener& ProtoListener::bind(IConnection* conn) noexcept
+    ProtoListener& ProtoListener::bind(IConnection& conn) noexcept
     {
         auto instance = std::make_unique<ProtoListener>();
         auto& retval = *instance;
-        retval._conn = conn;
-        conn->attach(
-            conn->ATTID_ProtoListener,
+        retval._conn = &conn;
+        conn.attach(
+            conn.ATTID_ProtoListener,
             std::move(instance));
-        conn->on_read = []
+        conn.on_read = []
             (IConnection& conn,
              const char* data,
              size_t len) -> bool

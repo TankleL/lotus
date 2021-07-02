@@ -1,10 +1,11 @@
 #include <cassert>
 
 #include "connstr.hxx"
+#include "ctxmgr.hxx"
 #include "protolstnr.hxx"
 #include "staloop-intl.hxx"
 #include "tcpconn-cli.hxx"
-#include "proto-session-lstnr.hxx"
+#include "proto-session.hxx"
 
 namespace lotus::core::connection
 {
@@ -39,7 +40,8 @@ namespace lotus::core::connection
         (const uvw::ConnectEvent& ce, uvw::TCPHandle& tcp)
         {
             _is_connected = true;
-            protocols::ProtoListener::bind(this);
+            protocols::ProtoListener::bind(*this);
+            ContextManager::bind(*this);
             cb(this);
         });
 

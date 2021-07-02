@@ -6,13 +6,13 @@ namespace lotus::core
     namespace pt = lotus::core::protocols;
     namespace pts = lotus::core::protocols::proto_session;
 
-    SessionManager::SessionManager()
+    SessionManager::SessionManager() noexcept
         : _conn(nullptr)
         , _last_sid(0)
         , _last_trxid(0)
     {}
 
-    SessionManager::~SessionManager()
+    SessionManager::~SessionManager() noexcept
     {}
 
     SessionManager& SessionManager::bind(IConnection& conn) noexcept
@@ -53,7 +53,7 @@ namespace lotus::core
         pts::SessionReq<pt::ZeroBased> req;
         req.intention =
             pts::SessionReq<pt::ZeroBased>::Intention::begin_session;
-        req.trx_id = ++_last_sid;
+        req.ctx_id = ++_last_sid;
 
         auto package = req.pack();
         _conn->write(package.data(), package.length());
@@ -83,6 +83,7 @@ namespace lotus::core
             break;
             
         default:
+            break;
         }
         return true;
     }
@@ -99,7 +100,7 @@ namespace lotus::core
             _sessmap.emplace(sid, std::move(sess));
 
             pts::SessionRsp<pt::ZeroBased> rsp;
-            rsp.trx_id = req.trx_id;
+            rsp.ctx_id = req.ctx_id;
             rsp.response_id = 200;
             rsp.session_id = sid;
 
@@ -124,7 +125,8 @@ namespace lotus::core
         pts::SessionRsp<pt::ProtocolResponse<pt::ProtocolBase>>
             sess_rsp(std::move(rsp));
         sess_rsp.unpack(pack.data() + offset, pack.size() - offset);
-        
+
+        return true;
     }
 } // namespace lotus::core
 
