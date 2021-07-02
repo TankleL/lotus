@@ -56,7 +56,6 @@ namespace lotus::core
         IConnection* _conn;
         std::unordered_map<uint32_t, std::unique_ptr<Session>> _sessmap;
         uint32_t _last_sid;
-        uint32_t _last_trxid;
     };
 }
 

@@ -1,3 +1,4 @@
+#include "ctxmgr.hxx"
 #include "proto-session.hxx"
 #include "sessionmgr.hxx"
 
@@ -6,10 +7,14 @@ namespace lotus::core
     namespace pt = lotus::core::protocols;
     namespace pts = lotus::core::protocols::proto_session;
 
+    struct SessionReqCtx : public Context
+    {
+        pts::SessionReq<pt::ZeroBased> req_info;
+    };
+
     SessionManager::SessionManager() noexcept
         : _conn(nullptr)
         , _last_sid(0)
-        , _last_trxid(0)
     {}
 
     SessionManager::~SessionManager() noexcept
@@ -50,12 +55,17 @@ namespace lotus::core
 
     void SessionManager::begin_session(begin_session_cb cb)
     {
-        pts::SessionReq<pt::ZeroBased> req;
-        req.intention =
-            pts::SessionReq<pt::ZeroBased>::Intention::begin_session;
-        req.ctx_id = ++_last_sid;
+        auto ctxmgr =
+            _conn->attachment<ContextManager>(
+                _conn->ATTID_ContextManager);
+        auto& ctx =
+            ctxmgr->push_t(std::make_unique<SessionReqCtx>());
 
-        auto package = req.pack();
+        ctx.req_info.intention =
+            pts::SessionReq<pt::ZeroBased>::Intention::begin_session;
+        ctx.req_info.ctx_id = ctx.id;
+
+        auto package = ctx.req_info.pack();
         _conn->write(package.data(), package.length());
     }
 

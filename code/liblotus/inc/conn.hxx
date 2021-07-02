@@ -11,8 +11,9 @@ namespace lotus::core
     {
     public:
         // reserved attachment id list
-        static constexpr int ATTID_ProtoListener = 0;
-        static constexpr int ATTID_SessionManager = 1;
+        static inline constexpr int ATTID_ProtoListener = 0;
+        static inline constexpr int ATTID_SessionManager = 1;
+        static inline constexpr int ATTID_ContextManager = 2;
 
         // read callback
         typedef std::function<
