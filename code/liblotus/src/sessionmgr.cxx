@@ -136,6 +136,29 @@ namespace lotus::core
             sess_rsp(std::move(rsp));
         sess_rsp.unpack(pack.data() + offset, pack.size() - offset);
 
+        auto ctxmgr =
+            _conn->attachment<ContextManager>(
+                _conn->ATTID_ContextManager);
+        auto ctx = ctxmgr->pop_t<SessionReqCtx>(sess_rsp.ctx_id);
+        if (!ctx)
+            return false;
+
+        switch (ctx->req_info.intention)
+        {
+        case pts::SessionReq<pt::ZeroBased>::Intention::begin_session:
+            return _handle_begin_session_rsp(sess_rsp);
+            break;
+
+        case pts::SessionReq<pt::ZeroBased>::Intention::end_session:
+            break;
+
+        case pts::SessionReq<pt::ZeroBased>::Intention::session_data:
+            break;
+
+        default:
+            return false;
+        }
+
         return true;
     }
 } // namespace lotus::core

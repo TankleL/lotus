@@ -33,6 +33,13 @@ namespace lotus::core
             return static_cast<TCtx&>(push(std::move(ctx)));
         }
 
+        template <typename TCtx>
+        std::unique_ptr<TCtx> pop_t(uint32_t id) noexcept
+        {
+            return std::unique_ptr<TCtx>(
+                static_cast<TCtx*>(pop(id).release()));
+        }
+
     private:
         std::unordered_map<
             uint32_t,
