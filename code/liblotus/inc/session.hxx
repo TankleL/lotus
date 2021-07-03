@@ -34,22 +34,15 @@ namespace lotus::core
         void send_msg(const char* data, size_t length) noexcept;
         void send_msg(std::vector<char>&& data) noexcept;
 
+        uint32_t get_id() const noexcept;
+
     private:
-        void _ensure_nsrs(session_req_t& req) noexcept;
         void _send_req(session_req_t& req)
             noexcept;
 
     private:
         uint32_t _id;
         IConnection* _conn;
-
-    private:
-        enum class new_session_req_state_e
-        {
-            not_sent = 0,
-            wait_for_rsp,
-            remote_acked 
-        } _nsrs_state;
     };
 } // namespace lotus::core
 

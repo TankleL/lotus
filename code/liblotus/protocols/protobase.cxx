@@ -42,8 +42,10 @@ namespace lotus::core::protocols
     }
 
     PackedPackage::PackedPackage(PackedPackage&& rhs) noexcept
-        : _native_stream(std::move(rhs._native_stream))
-    {}
+        : _native_stream(rhs._native_stream)
+    {
+        rhs._native_stream = nullptr;
+    }
 
     PackedPackage::~PackedPackage() noexcept
     {
@@ -52,7 +54,8 @@ namespace lotus::core::protocols
 
     PackedPackage& PackedPackage::operator=(PackedPackage&& rhs) noexcept
     {
-        _native_stream = std::move(rhs._native_stream);
+        _native_stream = rhs._native_stream;
+        rhs._native_stream = nullptr;
         return *this;
     }
 
@@ -95,9 +98,11 @@ namespace lotus::core::protocols
     }
 
     Packer::Packer(Packer&& rhs) noexcept
-        : _native_pac(std::move(rhs._native_pac))
+        : _native_pac(rhs._native_pac)
         , _package(std::move(rhs._package))
-    {}
+    {
+        rhs._native_pac = nullptr;
+    }
 
     Packer::~Packer() noexcept
     {
@@ -107,7 +112,7 @@ namespace lotus::core::protocols
 
     Packer& Packer::operator=(Packer&& rhs) noexcept
     {
-        _native_pac = std::move(rhs._native_pac);
+        _native_pac = rhs._native_pac; rhs._native_pac = nullptr;
         _package = std::move(rhs._package);
         return *this;
     }
@@ -155,14 +160,19 @@ namespace lotus::core::protocols
     {}
 
     Unpacker::Unpacker(const char* data, size_t length) noexcept
+        : _native_pac(new msgpack::unpacker())
+        , _native_obj_handle(new msgpack::object_handle())
     {
         consume(data, length);
     }
 
     Unpacker::Unpacker(Unpacker&& rhs) noexcept
-        : _native_pac(std::move(rhs._native_pac))
-        , _native_obj_handle(std::move(rhs._native_obj_handle))
-    {}
+        : _native_pac(rhs._native_pac)
+        , _native_obj_handle(rhs._native_obj_handle)
+    {
+        rhs._native_pac = nullptr;
+        rhs._native_obj_handle = nullptr;
+    }
 
     Unpacker::~Unpacker() noexcept
     {
@@ -173,8 +183,10 @@ namespace lotus::core::protocols
 
     Unpacker& Unpacker::operator=(Unpacker&& rhs) noexcept
     {
-        _native_pac = std::move(rhs._native_pac);
-        _native_obj_handle = std::move(rhs._native_obj_handle);
+        _native_pac = rhs._native_pac;
+        rhs._native_pac = nullptr;
+        _native_obj_handle = rhs._native_obj_handle;
+        rhs._native_obj_handle = nullptr;
         return *this;
     }
 

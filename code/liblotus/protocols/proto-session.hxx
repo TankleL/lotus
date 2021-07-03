@@ -21,11 +21,13 @@ namespace lotus::core::protocols::proto_session
             end_session = 2,
             session_data = 3,
         } intention;
+        uint32_t session_id;
         std::vector<char> payload;
 
         SessionReq(ProtocolRequest<ProtocolBase>&& base) noexcept
             : ProtocolRequest<ProtocolBase>(std::move(base))
             , intention(Intention::bad_intention)
+            , session_id(0)
         {
             request_id = REQ_ID;
         }
@@ -33,6 +35,7 @@ namespace lotus::core::protocols::proto_session
         virtual void on_packing(Packer& pac) noexcept override
         {
             pac.pack_int32(static_cast<int32_t>(intention));
+            pac.pack_uint32(session_id);
             pac.pack_blob(payload);
         }
 
@@ -41,6 +44,10 @@ namespace lotus::core::protocols::proto_session
             if (!pac.next())
                 return pac.parsed_size();
             intention = static_cast<Intention>(pac.to_int32());
+
+            if (!pac.next())
+                return pac.parsed_size();
+            session_id = pac.to_uint32();
             
             if (!pac.next())
                 return pac.parsed_size();

@@ -18,6 +18,7 @@ namespace lotus::core::connection
     public:
         ~TCPServerSideConnection();
 
+        void read() override;
         size_t write(const char* data, size_t length) override { return 0; }
         void close() noexcept;
 

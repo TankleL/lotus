@@ -42,6 +42,14 @@ namespace lotus::core::connection
         close();
     }
 
+    void TCPServerSideConnection::read() 
+    {
+        auto client =
+            std::static_pointer_cast<uvw::TCPHandle>(
+                _tcp_client_handle);
+        client->read();
+    }
+
     std::unique_ptr<TCPServerSideConnection>
         TCPServerSideConnection::accept(
             void* tcp_server_handle) noexcept

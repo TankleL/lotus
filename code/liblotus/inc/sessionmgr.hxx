@@ -46,6 +46,10 @@ namespace lotus::core
             protocols::proto_session::SessionReq<
                 protocols::ProtocolRequest<
                 protocols::ProtocolBase>>& req);
+        bool _handle_session_data_req(
+            protocols::proto_session::SessionReq<
+                protocols::ProtocolRequest<
+                protocols::ProtocolBase>>& req);
 
         bool _handle_session_rsp(
             protocols::ProtocolResponse<protocols::ProtocolBase>&& rsp,

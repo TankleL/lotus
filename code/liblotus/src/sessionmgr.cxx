@@ -92,6 +92,7 @@ namespace lotus::core
             break;
 
         case pts::SessionReq<pt::ZeroBased>::Intention::session_data:
+            return _handle_session_data_req(sess_req);
             break;
             
         default:
@@ -127,6 +128,14 @@ namespace lotus::core
             // TODO: add trace logs
             return false;
         }
+    }
+
+    bool SessionManager::_handle_session_data_req(
+        protocols::proto_session::SessionReq<
+            protocols::ProtocolRequest<
+            protocols::ProtocolBase>>& req)
+    {
+        return true;
     }
 
     bool SessionManager::_handle_session_rsp(
