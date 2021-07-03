@@ -10,6 +10,7 @@ namespace lotus::core
     struct SessionReqCtx : public Context
     {
         pts::SessionReq<pt::ZeroBased> req_info;
+        SessionManager::begin_session_cb beg_cb;
     };
 
     SessionManager::SessionManager() noexcept
@@ -53,7 +54,7 @@ namespace lotus::core
         });
     }
 
-    void SessionManager::begin_session(begin_session_cb cb)
+    void SessionManager::begin_session(const begin_session_cb& cb)
     {
         auto ctxmgr =
             _conn->attachment<ContextManager>(
@@ -64,6 +65,7 @@ namespace lotus::core
         ctx.req_info.intention =
             pts::SessionReq<pt::ZeroBased>::Intention::begin_session;
         ctx.req_info.ctx_id = ctx.id;
+        ctx.beg_cb = cb;
 
         auto package = ctx.req_info.pack();
         _conn->write(package.data(), package.length());
@@ -146,7 +148,7 @@ namespace lotus::core
         switch (ctx->req_info.intention)
         {
         case pts::SessionReq<pt::ZeroBased>::Intention::begin_session:
-            return _handle_begin_session_rsp(sess_rsp);
+            return _handle_begin_session_rsp(sess_rsp, *ctx);
             break;
 
         case pts::SessionReq<pt::ZeroBased>::Intention::end_session:
@@ -159,6 +161,29 @@ namespace lotus::core
             return false;
         }
 
+        return true;
+    }
+
+    bool SessionManager::_handle_begin_session_rsp(
+        protocols::proto_session::SessionRsp<
+            protocols::ProtocolResponse<
+            protocols::ProtocolBase>>& rsp,
+        Context& ctx)
+    {
+        auto& context = static_cast<SessionReqCtx&>(ctx);
+        if (rsp.result_code != 200)
+        {
+            context.beg_cb(rsp.result_code, nullptr);
+        }
+        else
+        {
+            auto sid = rsp.session_id;
+            auto sess =
+                std::make_unique<Session>(sid, _conn);
+            auto sess_ptr = sess.get();
+            _sessmap[sid] = std::move(sess);
+            context.beg_cb(rsp.result_code, sess_ptr);
+        }
         return true;
     }
 } // namespace lotus::core

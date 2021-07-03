@@ -15,8 +15,12 @@ namespace lotus::core
     class SessionManager final : public IAttachment 
     {
     public:
-        using begin_session_cb = std::function<void(void)>;
-        using end_session_cb = std::function<void(void)>;
+        using begin_session_cb =
+            std::function<void(
+                int32_t result_code,
+                Session* session)>;
+        using end_session_cb =
+            std::function<void(int32_t result_code)>;
         using new_session_cb = std::function<void(void)>;
 
     public:
@@ -28,8 +32,8 @@ namespace lotus::core
         void associate_with(
             protocols::ProtoListener& listener) noexcept;
 
-        void begin_session(begin_session_cb callback) ;
-        void end_session(end_session_cb callback);
+        void begin_session(const begin_session_cb& callback) ;
+        void end_session(const end_session_cb& callback);
         void on_new_session() noexcept;
         void on_kill_session() noexcept;
 
@@ -50,7 +54,8 @@ namespace lotus::core
         bool _handle_begin_session_rsp(
             protocols::proto_session::SessionRsp<
                 protocols::ProtocolResponse<
-                protocols::ProtocolBase>>& rsp);
+                protocols::ProtocolBase>>& rsp,
+            Context& ctx);
 
     private:
         IConnection* _conn;
