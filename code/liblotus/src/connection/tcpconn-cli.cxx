@@ -3,6 +3,7 @@
 #include "connstr.hxx"
 #include "ctxmgr.hxx"
 #include "protolstnr.hxx"
+#include "sessionmgr.hxx"
 #include "staloop-intl.hxx"
 #include "tcpconn-cli.hxx"
 #include "proto-session.hxx"
@@ -34,15 +35,25 @@ namespace lotus::core::connection
             [](const uvw::ErrorEvent&, uvw::TCPHandle&){
         });
 
+        // end event
+        tcp->on<uvw::EndEvent>(
+            [this](const auto& ee, auto& tcp)
+        {
+            tcp.read();
+        });
+
         // connect event
         tcp->once<uvw::ConnectEvent>(
             [this, cb]
         (const uvw::ConnectEvent& ce, uvw::TCPHandle& tcp)
         {
             _is_connected = true;
-            protocols::ProtoListener::bind(*this);
             ContextManager::bind(*this);
+            auto& pl = protocols::ProtoListener::bind(*this);
+            auto& smgr = SessionManager::bind(*this);
+            smgr.associate_with(pl);
             cb(this);
+            tcp.read();
         });
 
         tcp->connect(cs.host(), cs.port());

@@ -157,18 +157,21 @@ namespace lotus::core::protocols
     Unpacker::Unpacker() noexcept
         : _native_pac(new msgpack::unpacker())
         , _native_obj_handle(new msgpack::object_handle())
+        , _buf_size(0)
     {}
 
     Unpacker::Unpacker(const char* data, size_t length) noexcept
         : _native_pac(new msgpack::unpacker())
         , _native_obj_handle(new msgpack::object_handle())
+        , _buf_size(0)
     {
-        consume(data, length);
+        set_data(data, length);
     }
 
     Unpacker::Unpacker(Unpacker&& rhs) noexcept
         : _native_pac(rhs._native_pac)
         , _native_obj_handle(rhs._native_obj_handle)
+        , _buf_size(std::move(rhs._buf_size))
     {
         rhs._native_pac = nullptr;
         rhs._native_obj_handle = nullptr;
@@ -187,15 +190,17 @@ namespace lotus::core::protocols
         rhs._native_pac = nullptr;
         _native_obj_handle = rhs._native_obj_handle;
         rhs._native_obj_handle = nullptr;
+        _buf_size = rhs._buf_size;
         return *this;
     }
 
-    void Unpacker::consume(const char* data, size_t length) noexcept
+    void Unpacker::set_data(const char* data, size_t length) noexcept
     {
         auto pac = static_cast<msgpack::unpacker*>(_native_pac);
         pac->reserve_buffer(length);
         memcpy(pac->buffer(), data, length);
         pac->buffer_consumed(length);
+        _buf_size = length;
     }
 
     bool Unpacker::next() noexcept
@@ -209,7 +214,7 @@ namespace lotus::core::protocols
     size_t Unpacker::parsed_size() const noexcept
     {
         auto pac = static_cast<msgpack::unpacker*>(_native_pac);
-        return pac->parsed_size();
+        return _buf_size - pac->nonparsed_size();
     }
 
     int32_t Unpacker::to_int32() const

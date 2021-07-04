@@ -19,7 +19,7 @@ namespace lotus::core::connection
         ~TCPServerSideConnection();
 
         void read() override;
-        size_t write(const char* data, size_t length) override { return 0; }
+        size_t write(const char* data, size_t length) override;
         void close() noexcept;
 
     public:
@@ -28,7 +28,6 @@ namespace lotus::core::connection
 
     private:
         std::shared_ptr<void> _tcp_client_handle;
-        bool _is_connected;
     };
 
     // TCPConnectionListener ----------------------------------------

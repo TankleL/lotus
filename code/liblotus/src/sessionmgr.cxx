@@ -35,7 +35,7 @@ namespace lotus::core
     {
         listener.add_request_callback(
             pts::SessionReq<pt::ZeroBased>::REQ_ID,
-            [this](auto&& req, auto&& pack, auto offset)->bool
+            [this](auto&& req, auto&& pack, size_t offset)->bool
         {
             return _handle_session_req(
                 std::move(req),

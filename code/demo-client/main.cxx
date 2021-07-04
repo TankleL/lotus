@@ -12,11 +12,10 @@ int main(int argc, char** argv)
     conn.connect("host=127.0.0.1; port=50500", []
     (IClientSideConnection* conn)
     {
-        auto& pl = protocols::ProtoListener::bind(*conn);
-        auto& smgr = SessionManager::bind(*conn);
+        auto* smgr = conn->attachment<SessionManager>(conn->ATTID_SessionManager);
         for (int i = 0; i < 10000; ++i)
         {
-            smgr.begin_session([](auto rescode, auto session)
+            smgr->begin_session([](auto rescode, auto session)
             {
                 std::cout << "--------------------------------------" << std::endl;
                 std::cout << "result_code = " << rescode << std::endl;

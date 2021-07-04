@@ -73,7 +73,7 @@ namespace lotus::core::protocols
         Unpacker& operator=(Unpacker&& rhs) noexcept;
 
     public:
-        void consume(const char* data, size_t length) noexcept;
+        void set_data(const char* data, size_t length) noexcept;
         bool next() noexcept;
         size_t parsed_size() const noexcept;
 
@@ -84,6 +84,8 @@ namespace lotus::core::protocols
     private:
         void* _native_pac;
         void* _native_obj_handle;
+
+        size_t _buf_size;
     };
 
     struct ProtocolBase

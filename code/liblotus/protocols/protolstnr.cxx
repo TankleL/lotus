@@ -110,14 +110,14 @@ namespace lotus::core::protocols
             uint32_t req_id,
             const req_callback_t& cb) noexcept
     {
-        _req_map[req_id] = cb;
+        _req_map.insert(std::make_pair(req_id, cb));
     }
 
     void ProtoListener::add_response_callback(
             uint32_t rsp_id,
             const rsp_callback_t& cb) noexcept
     {
-        _req_map[rsp_id] = cb;
+        _rsp_map.insert(std::make_pair(rsp_id, cb));
     }
 
     bool ProtoListener::parse(

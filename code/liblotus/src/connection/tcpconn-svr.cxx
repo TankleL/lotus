@@ -2,6 +2,7 @@
 #include "connstr.hxx"
 #include "ctxmgr.hxx"
 #include "protolstnr.hxx"
+#include "sessionmgr.hxx"
 #include "staloop-intl.hxx"
 
 namespace lotus::core::connection
@@ -22,8 +23,10 @@ namespace lotus::core::connection
         tcp->on<uvw::ListenEvent>([this]
         (const uvw::ListenEvent&, uvw::TCPHandle& svr) {
             auto conn = TCPServerSideConnection::accept(&svr);
-            protocols::ProtoListener::bind(*conn);
             ContextManager::bind(*conn);
+            auto& pl = protocols::ProtoListener::bind(*conn);
+            auto& smgr = SessionManager::bind(*conn);
+            smgr.associate_with(pl);
             if(this->on_create_connection != nullptr)
                 this->on_create_connection(conn);
         });
@@ -34,7 +37,6 @@ namespace lotus::core::connection
 
     // TCPServerSideConnection --------------------------------------
     TCPServerSideConnection::TCPServerSideConnection() noexcept
-        : _is_connected(false)
     {}
 
     TCPServerSideConnection::~TCPServerSideConnection()
@@ -79,10 +81,37 @@ namespace lotus::core::connection
                 connection->close();
         });
 
+        client->on<uvw::EndEvent>(
+            [](const auto& ee, auto& client)
+        {
+            client.read();
+        });
+
         conn->_tcp_client_handle = client;
 
         tcp_svr->accept(*client);
+        client->read();
         return std::move(conn);
+    }
+
+    size_t TCPServerSideConnection::write(
+        const char* data,
+        size_t length)
+    {
+        auto tcp =
+            std::static_pointer_cast<uvw::TCPHandle>(
+                _tcp_client_handle);
+        if(tcp->writable())
+        {
+            tcp->write(
+                const_cast<char*>(data),
+                static_cast<unsigned int>(length));
+            return length;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     void TCPServerSideConnection::close() noexcept
