@@ -24,6 +24,9 @@ namespace lotus::core::connection
         size_t write(const char* data, size_t length) override;
 
     private:
+        bool _on_read(const char* data, size_t length);
+
+    private:
         STALoop* _loop;
         std::shared_ptr<void> _tcp_handle;
         bool _is_connected;

@@ -42,6 +42,14 @@ namespace lotus::core::connection
             tcp.read();
         });
 
+        // data event
+        tcp->on<uvw::DataEvent>(
+            [this](const uvw::DataEvent& de, uvw::TCPHandle& tcp)
+        {
+            if (!_on_read(de.data.get(), de.length))
+                tcp.close();
+        });
+
         // connect event
         tcp->once<uvw::ConnectEvent>(
             [this, cb]
@@ -92,6 +100,16 @@ namespace lotus::core::connection
         {
             return 0;
         }
+    }
+
+    bool TCPClientSideConnection::_on_read(
+        const char* data,
+        size_t length)
+    {
+        auto pl =
+            this->attachment<protocols::ProtoListener>(
+                ATTID_ProtoListener);
+        return pl->parse(data, length);
     }
 }
 

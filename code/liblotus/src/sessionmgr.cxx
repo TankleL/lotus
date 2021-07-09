@@ -118,8 +118,8 @@ namespace lotus::core
             rsp.session_id = sid;
 
             auto package = rsp.pack();
-            if(_conn->write(package.data(), package.length()
-                == package.length()))
+            if(_conn->write(package.data(), package.length())
+                == package.length())
                 return true;
             return false;
         }
