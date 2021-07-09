@@ -114,7 +114,7 @@ namespace lotus::core
 
             pts::SessionRsp<pt::ZeroBased> rsp;
             rsp.ctx_id = req.ctx_id;
-            rsp.response_id = 200;
+            rsp.result_code = 200;
             rsp.session_id = sid;
 
             auto package = rsp.pack();

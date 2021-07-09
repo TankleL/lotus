@@ -15,11 +15,11 @@ int main(int argc, char** argv)
         auto* smgr = conn->attachment<SessionManager>(conn->ATTID_SessionManager);
         for (int i = 0; i < 10000; ++i)
         {
-            smgr->begin_session([](auto rescode, auto session)
+            smgr->begin_session([idx=i](auto rescode, auto session)
             {
-                std::cout << "--------------------------------------" << std::endl;
-                std::cout << "result_code = " << rescode << std::endl;
-                std::cout << "session_id = " << session->get_id() << std::endl;
+                //std::cout << idx << "--------------------------------------" << std::endl;
+                //std::cout << "result_code = " << rescode << std::endl;
+                //std::cout << "session_id = " << session->get_id() << std::endl;
             });
         }
     });

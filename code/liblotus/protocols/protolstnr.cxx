@@ -258,9 +258,25 @@ namespace lotus::core::protocols
                         std::move(pack),
                         read + req_read);
                 }
-            }
                 break;
+            }
             case ProtocolBase::ProtocolType::response:
+            {
+                ProtocolResponse<ProtocolBase> rsp(std::move(pb));
+                auto rsp_read = rsp.unpack(
+                    pack.data() + read,
+                    pack.size() - read);
+
+                const auto& entry = _rsp_map.find(rsp.response_id);
+                if (entry != _rsp_map.cend())
+                {
+                    return entry->second(
+                        std::move(rsp),
+                        std::move(pack),
+                        read + rsp_read);
+                }
+                break;
+            }
             case ProtocolBase::ProtocolType::notification:
             case ProtocolBase::ProtocolType::unknown:
                 break;
