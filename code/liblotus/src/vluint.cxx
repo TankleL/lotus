@@ -3,7 +3,7 @@
 
 namespace lotus::core::variant_length
 {
-    vluint::vluint() noexcept
+    vluint::vluint() 
         : _data({0})
         , _esize(0)
         , _dsize(0)
@@ -13,7 +13,7 @@ namespace lotus::core::variant_length
         value(0);
     }
 
-    vluint::vluint(std::uint32_t val) noexcept
+    vluint::vluint(std::uint32_t val) 
         : _data({0})
         , _esize(0)
         , _dsize(0)
@@ -23,7 +23,7 @@ namespace lotus::core::variant_length
         value(val);
     }
 
-    vluint::vluint(const vluint& rhs) noexcept
+    vluint::vluint(const vluint& rhs) 
         : _data(rhs._data)
         , _esize(rhs._esize)
         , _dsize(rhs._dsize)
@@ -32,7 +32,7 @@ namespace lotus::core::variant_length
     {
     }
 
-    vluint::vluint(vluint&& rhs) noexcept
+    vluint::vluint(vluint&& rhs) 
         : _data(std::move(rhs._data))
         , _esize(rhs._esize)
         , _dsize(rhs._dsize)
@@ -40,7 +40,7 @@ namespace lotus::core::variant_length
         , _value(rhs._value)
     {}
 
-    vluint& vluint::operator=(const vluint& rhs) noexcept
+    vluint& vluint::operator=(const vluint& rhs) 
     {
         _data = rhs._data;
         _esize = rhs._esize;
@@ -50,7 +50,7 @@ namespace lotus::core::variant_length
         return *this;
     }
 
-    vluint& vluint::operator=(vluint&& rhs) noexcept
+    vluint& vluint::operator=(vluint&& rhs) 
     {
         _data = std::move(rhs._data);
         _esize = rhs._esize;
@@ -63,17 +63,17 @@ namespace lotus::core::variant_length
     vluint::~vluint()
     {}
 
-    std::uint32_t vluint::value() const noexcept
+    std::uint32_t vluint::value() const 
     {
         return _value;
     }
 
-    int vluint::decoded_size() const noexcept
+    int vluint::decoded_size() const 
     {
         return _dsize;
     }
 
-    void vluint::value(std::uint32_t val) noexcept
+    void vluint::value(std::uint32_t val) 
     {
         memset(_data.data(), 0, _data.size());
 
@@ -142,7 +142,7 @@ namespace lotus::core::variant_length
     }
 
     vluint::digest_state_e
-    vluint::digest(const std::uint8_t& byte) noexcept
+    vluint::digest(const std::uint8_t& byte) 
     {
         switch (_digst)
         {
@@ -281,12 +281,12 @@ namespace lotus::core::variant_length
         return _digst;
     }
 
-    int vluint::encoded_size() const noexcept
+    int vluint::encoded_size() const 
     {
         return _esize;
     }
 
-    const std::uint8_t* vluint::encoded_data() const noexcept
+    const std::uint8_t* vluint::encoded_data() const 
     {
         return _data.data();
     }

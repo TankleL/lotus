@@ -49,7 +49,7 @@ namespace lotus::core
         virtual void connect(
             const std::string conn_str,
             connect_callback_t cb) = 0;
-        virtual void disconnect() noexcept = 0;
+        virtual void disconnect()  = 0;
     };
 
     class IServerSideConnection : public IConnection

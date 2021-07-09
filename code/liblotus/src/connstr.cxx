@@ -10,7 +10,7 @@ namespace lotus::core::_internal
 
     const std::string ConnString::not_seg_val = "";
 
-    ConnString::ConnString(const std::string& connstr) noexcept
+    ConnString::ConnString(const std::string& connstr) 
         : _port(0)
     {
         auto seg_beg = std::sregex_iterator(
@@ -28,7 +28,7 @@ namespace lotus::core::_internal
         _filter_common_segements();
     }
 
-    void ConnString::_filter_common_segements() noexcept
+    void ConnString::_filter_common_segements() 
     {
         if(_segments.find(g_connstr_seg_name_host)
             != _segments.cend())
@@ -52,7 +52,7 @@ namespace lotus::core::_internal
     }
 
     std::string ConnString::segment(
-        const std::string& name) const noexcept
+        const std::string& name) const 
     {
         const auto seg = _segments.find(name);
         if (seg != _segments.cend())
@@ -65,17 +65,17 @@ namespace lotus::core::_internal
         }
     }
 
-    std::string ConnString::host() const noexcept
+    std::string ConnString::host() const 
     {
         return _host;
     }
 
-    uint16_t ConnString::port() const noexcept
+    uint16_t ConnString::port() const 
     {
         return _port;
     }
 
-    int ConnString::backlogs() const noexcept
+    int ConnString::backlogs() const 
     {
         return _backlogs;
     }

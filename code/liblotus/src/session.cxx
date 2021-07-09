@@ -8,17 +8,17 @@ namespace lotus::core
     namespace pt = protocols;
     namespace pts = protocols::proto_session;
 
-    Session::Session(IConnection* conn) noexcept
+    Session::Session(IConnection* conn) 
         : _id(0)
         , _conn(conn)
     {}
 
-    Session::Session(uint32_t id, IConnection* conn) noexcept
+    Session::Session(uint32_t id, IConnection* conn) 
         : _id(id)
         , _conn(conn)
     {}
 
-    void Session::send_msg(const char* data, size_t length) noexcept
+    void Session::send_msg(const char* data, size_t length) 
     {
         assert(
             length > 0 &&
@@ -33,7 +33,7 @@ namespace lotus::core
         _send_req(req);
     }
 
-    void Session::send_msg(std::vector<char>&& data) noexcept
+    void Session::send_msg(std::vector<char>&& data) 
     {
         assert(
             data.size() > 0 &&
@@ -47,12 +47,12 @@ namespace lotus::core
         _send_req(req);
     }
 
-    uint32_t Session::get_id() const noexcept
+    uint32_t Session::get_id() const 
     {
         return _id;
     }
 
-    void Session::_send_req(session_req_t& req) noexcept
+    void Session::_send_req(session_req_t& req) 
     {
         assert(_conn != nullptr);
 

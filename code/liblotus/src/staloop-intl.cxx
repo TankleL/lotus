@@ -3,16 +3,16 @@
 
 namespace lotus::core::_internal
 {
-    STALoopImpl::STALoopImpl() noexcept
+    STALoopImpl::STALoopImpl() 
         : _loop(uvw::Loop::create())
     {}
 
-    void STALoopImpl::run() noexcept
+    void STALoopImpl::run() 
     {
         _loop->run();
     }
 
-    uvw::Loop* STALoopImpl::_native_loop() noexcept
+    uvw::Loop* STALoopImpl::_native_loop() 
     {
         return _loop.get();
     }

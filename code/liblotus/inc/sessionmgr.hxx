@@ -24,18 +24,18 @@ namespace lotus::core
         using new_session_cb = std::function<void(void)>;
 
     public:
-        SessionManager() noexcept;
-        ~SessionManager() noexcept;
+        SessionManager() ;
+        ~SessionManager() ;
 
     public:
-        static SessionManager& bind(IConnection& conn) noexcept;
+        static SessionManager& bind(IConnection& conn) ;
         void associate_with(
-            protocols::ProtoListener& listener) noexcept;
+            protocols::ProtoListener& listener) ;
 
         void begin_session(const begin_session_cb& callback) ;
         void end_session(const end_session_cb& callback);
-        void on_new_session() noexcept;
-        void on_kill_session() noexcept;
+        void on_new_session() ;
+        void on_kill_session() ;
 
     private:
         bool _handle_session_req(

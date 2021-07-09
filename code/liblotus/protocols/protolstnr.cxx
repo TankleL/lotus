@@ -6,47 +6,47 @@
 namespace lotus::core::protocols
 {
     // ListenedPackage ----------------------------------------------
-    ListenedPackage::ListenedPackage() noexcept
+    ListenedPackage::ListenedPackage() 
         : _buf(nullptr)
         , _length(0)
     {}
 
-    ListenedPackage::ListenedPackage(size_t size) noexcept
+    ListenedPackage::ListenedPackage(size_t size) 
         : _buf(new char[size])
         , _length(size)
     {}
 
-    ListenedPackage::ListenedPackage(ListenedPackage&& rhs) noexcept
+    ListenedPackage::ListenedPackage(ListenedPackage&& rhs) 
         : _buf(std::move(rhs._buf))
         , _length(std::move(rhs._length))
     {}
 
-    ListenedPackage::~ListenedPackage() noexcept
+    ListenedPackage::~ListenedPackage() 
     {
         delete[] _buf;
         _length = 0;
     }
 
     ListenedPackage& ListenedPackage::operator=(
-        ListenedPackage&& rhs) noexcept
+        ListenedPackage&& rhs) 
     {
         _buf = std::move(rhs._buf);
         _length = std::move(rhs._length);
         return *this;
     }
 
-    char* ListenedPackage::data() const noexcept
+    char* ListenedPackage::data() const 
     {
         return _buf;
     }
 
-    size_t ListenedPackage::size() const noexcept
+    size_t ListenedPackage::size() const 
     {
         return _length;
     }
 
     ListenedPackage& ListenedPackage::acquire(
-        ListenedPackage& src) noexcept
+        ListenedPackage& src) 
     {
         _buf = src._buf;
         _length = src._length;
@@ -57,12 +57,12 @@ namespace lotus::core::protocols
         return *this;
     }
 
-    bool ListenedPackage::is_available() const noexcept
+    bool ListenedPackage::is_available() const 
     {
         return _buf != nullptr;
     }
 
-    ListenedPackage& ListenedPackage::redefine(size_t size) noexcept
+    ListenedPackage& ListenedPackage::redefine(size_t size) 
     {
         if(_buf == nullptr || _length != size)
         {
@@ -74,17 +74,17 @@ namespace lotus::core::protocols
     }
 
     // ProtoListener ------------------------------------------------
-    ProtoListener::ProtoListener() noexcept
+    ProtoListener::ProtoListener() 
         : _conn(nullptr)
         , _parse_state(ParseState::idle)
         , _tmp_pack_size(0)
         , _tmp_pack_read(0)
     {}
 
-    ProtoListener::~ProtoListener() noexcept
+    ProtoListener::~ProtoListener() 
     {}
 
-    ProtoListener& ProtoListener::bind(IConnection& conn) noexcept
+    ProtoListener& ProtoListener::bind(IConnection& conn) 
     {
         auto instance = std::make_unique<ProtoListener>();
         auto& retval = *instance;
@@ -108,21 +108,21 @@ namespace lotus::core::protocols
 
     void ProtoListener::add_request_callback(
             uint32_t req_id,
-            const req_callback_t& cb) noexcept
+            const req_callback_t& cb) 
     {
         _req_map.insert(std::make_pair(req_id, cb));
     }
 
     void ProtoListener::add_response_callback(
             uint32_t rsp_id,
-            const rsp_callback_t& cb) noexcept
+            const rsp_callback_t& cb) 
     {
         _rsp_map.insert(std::make_pair(rsp_id, cb));
     }
 
     bool ProtoListener::parse(
         const char* data,
-        size_t length) noexcept
+        size_t length) 
     {
         size_t i = 0;
         while(i < length)
@@ -201,7 +201,7 @@ namespace lotus::core::protocols
         return true;
     }
 
-    void ProtoListener::_ensure_pack() noexcept
+    void ProtoListener::_ensure_pack() 
     {
         assert(_tmp_pack_size > 0);
         if(!_tmp_pack.is_available() ||
@@ -213,7 +213,7 @@ namespace lotus::core::protocols
 
     bool ProtoListener::_parse_single_pack(
         const char* data,
-        size_t length) noexcept
+        size_t length) 
     {
         assert(length <= _tmp_pack_size &&
             _tmp_pack_read + length <= _tmp_pack_size);
@@ -230,7 +230,7 @@ namespace lotus::core::protocols
         return true;
     }
 
-    bool ProtoListener::_dispatch(ListenedPackage&& pack) noexcept
+    bool ProtoListener::_dispatch(ListenedPackage&& pack) 
     {
         ProtocolBase pb;
         size_t read = pb.unpack(pack.data(), pack.size());

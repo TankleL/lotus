@@ -18,7 +18,7 @@ namespace lotus::core::connection
             const std::string conn_str,
             connect_callback_t cb) override;
 
-        void disconnect() noexcept override;
+        void disconnect()  override;
 
         void read() override {};
         size_t write(const char* data, size_t length) override;

@@ -33,7 +33,7 @@ namespace lotus::core::protocols
     {}
 
     // PackedPackage ------------------------------------------------------
-    PackedPackage::PackedPackage() noexcept
+    PackedPackage::PackedPackage() 
         : _native_stream(new msgpack::sbuffer())
     {
         static constexpr char fixed_header[] = { 0, 0 };
@@ -41,30 +41,30 @@ namespace lotus::core::protocols
         s->write(fixed_header, FIXED_HEADER_LENGTH);
     }
 
-    PackedPackage::PackedPackage(PackedPackage&& rhs) noexcept
+    PackedPackage::PackedPackage(PackedPackage&& rhs) 
         : _native_stream(rhs._native_stream)
     {
         rhs._native_stream = nullptr;
     }
 
-    PackedPackage::~PackedPackage() noexcept
+    PackedPackage::~PackedPackage() 
     {
         delete static_cast<msgpack::sbuffer*>(_native_stream);
     }
 
-    PackedPackage& PackedPackage::operator=(PackedPackage&& rhs) noexcept
+    PackedPackage& PackedPackage::operator=(PackedPackage&& rhs) 
     {
         _native_stream = rhs._native_stream;
         rhs._native_stream = nullptr;
         return *this;
     }
 
-    void* PackedPackage::native_stream() const noexcept
+    void* PackedPackage::native_stream() const 
     {
         return _native_stream;
     }
 
-    void PackedPackage::refresh_header() noexcept
+    void PackedPackage::refresh_header() 
     {
         auto s = static_cast<msgpack::sbuffer*>(_native_stream);
         const size_t payload_len = s->size() - FIXED_HEADER_LENGTH;
@@ -75,20 +75,20 @@ namespace lotus::core::protocols
         buf[1] = static_cast<char>(masked_payload_len >> 8);
     }
 
-    const char* PackedPackage::data() const noexcept
+    const char* PackedPackage::data() const 
     {
         auto s = static_cast<msgpack::sbuffer*>(_native_stream);
         return s->data();
     }
 
-    size_t PackedPackage::length() const noexcept
+    size_t PackedPackage::length() const 
     {
         auto s = static_cast<msgpack::sbuffer*>(_native_stream);
         return s->size();
     }
 
     // Packer -------------------------------------------------------
-    Packer::Packer() noexcept
+    Packer::Packer() 
         : _native_pac(nullptr)
     {
         using namespace msgpack;
@@ -97,20 +97,20 @@ namespace lotus::core::protocols
         _native_pac = pac;
     }
 
-    Packer::Packer(Packer&& rhs) noexcept
+    Packer::Packer(Packer&& rhs) 
         : _native_pac(rhs._native_pac)
         , _package(std::move(rhs._package))
     {
         rhs._native_pac = nullptr;
     }
 
-    Packer::~Packer() noexcept
+    Packer::~Packer() 
     {
         using namespace msgpack;
         delete static_cast<packer<sbuffer>*>(_native_pac);
     }
 
-    Packer& Packer::operator=(Packer&& rhs) noexcept
+    Packer& Packer::operator=(Packer&& rhs) 
     {
         _native_pac = rhs._native_pac; rhs._native_pac = nullptr;
         _package = std::move(rhs._package);
@@ -154,13 +154,13 @@ namespace lotus::core::protocols
     }
 
     // Unpacker -----------------------------------------------------
-    Unpacker::Unpacker() noexcept
+    Unpacker::Unpacker() 
         : _native_pac(new msgpack::unpacker())
         , _native_obj_handle(new msgpack::object_handle())
         , _buf_size(0)
     {}
 
-    Unpacker::Unpacker(const char* data, size_t length) noexcept
+    Unpacker::Unpacker(const char* data, size_t length) 
         : _native_pac(new msgpack::unpacker())
         , _native_obj_handle(new msgpack::object_handle())
         , _buf_size(0)
@@ -168,7 +168,7 @@ namespace lotus::core::protocols
         set_data(data, length);
     }
 
-    Unpacker::Unpacker(Unpacker&& rhs) noexcept
+    Unpacker::Unpacker(Unpacker&& rhs) 
         : _native_pac(rhs._native_pac)
         , _native_obj_handle(rhs._native_obj_handle)
         , _buf_size(std::move(rhs._buf_size))
@@ -177,14 +177,14 @@ namespace lotus::core::protocols
         rhs._native_obj_handle = nullptr;
     }
 
-    Unpacker::~Unpacker() noexcept
+    Unpacker::~Unpacker() 
     {
         using namespace msgpack;
         delete static_cast<object_handle*>(_native_obj_handle);
         delete static_cast<unpacker*>(_native_pac);
     }
 
-    Unpacker& Unpacker::operator=(Unpacker&& rhs) noexcept
+    Unpacker& Unpacker::operator=(Unpacker&& rhs) 
     {
         _native_pac = rhs._native_pac;
         rhs._native_pac = nullptr;
@@ -194,7 +194,7 @@ namespace lotus::core::protocols
         return *this;
     }
 
-    void Unpacker::set_data(const char* data, size_t length) noexcept
+    void Unpacker::set_data(const char* data, size_t length) 
     {
         auto pac = static_cast<msgpack::unpacker*>(_native_pac);
         pac->reserve_buffer(length);
@@ -203,7 +203,7 @@ namespace lotus::core::protocols
         _buf_size = length;
     }
 
-    bool Unpacker::next() noexcept
+    bool Unpacker::next() 
     {
         using namespace msgpack;
         auto pac = static_cast<unpacker*>(_native_pac);
@@ -211,7 +211,7 @@ namespace lotus::core::protocols
         return pac->next(*oh);
     }
 
-    size_t Unpacker::parsed_size() const noexcept
+    size_t Unpacker::parsed_size() const 
     {
         auto pac = static_cast<msgpack::unpacker*>(_native_pac);
         return _buf_size - pac->nonparsed_size();
@@ -241,21 +241,21 @@ namespace lotus::core::protocols
     }
 
     // ProtocolBase -------------------------------------------------
-    ProtocolBase::ProtocolBase() noexcept
+    ProtocolBase::ProtocolBase() 
         : proto_type(ProtocolType::unknown)
     {}
 
-    ProtocolBase::ProtocolBase(ProtocolBase&& rhs) noexcept
+    ProtocolBase::ProtocolBase(ProtocolBase&& rhs) 
         : proto_type(std::move(rhs.proto_type))
     {}
 
-    ProtocolBase& ProtocolBase::operator=(ProtocolBase&& rhs) noexcept
+    ProtocolBase& ProtocolBase::operator=(ProtocolBase&& rhs) 
     {
         proto_type = std::move(rhs.proto_type);
         return *this;
     }
 
-    PackedPackage ProtocolBase::pack() noexcept
+    PackedPackage ProtocolBase::pack() 
     {
         Packer pac;
         on_packing(pac);
@@ -270,7 +270,7 @@ namespace lotus::core::protocols
         return on_unpacking(pac);
     }
 
-    void ProtocolBase::on_packing(Packer& pac) noexcept
+    void ProtocolBase::on_packing(Packer& pac) 
     {
         pac.pack_int32(static_cast<int32_t>(proto_type));
     }

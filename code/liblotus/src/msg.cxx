@@ -15,7 +15,7 @@ namespace lotus::core
         , im(rhs.im)
     {}
 
-    Message::Message(Message&& rhs) noexcept
+    Message::Message(Message&& rhs) 
         : session_id(std::move(rhs.session_id))
         , session_payload(std::move(rhs.session_payload))
         , payload(std::move(rhs.payload))
@@ -43,7 +43,7 @@ namespace lotus::core
         return *this;
     }
 
-    Message& Message::operator=(Message&& rhs) noexcept
+    Message& Message::operator=(Message&& rhs) 
     {
         session_id = std::move(rhs.session_id);
         session_payload = std::move(rhs.session_payload);

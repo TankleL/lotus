@@ -13,7 +13,7 @@ namespace lotus::core::connection
     {}
 
     void TCPConnectionListener::listen(
-        const std::string& connstr) noexcept
+        const std::string& connstr) 
     {
         using namespace _internal;
         ConnString cs(connstr);
@@ -36,7 +36,7 @@ namespace lotus::core::connection
     }
 
     // TCPServerSideConnection --------------------------------------
-    TCPServerSideConnection::TCPServerSideConnection() noexcept
+    TCPServerSideConnection::TCPServerSideConnection() 
     {}
 
     TCPServerSideConnection::~TCPServerSideConnection()
@@ -54,7 +54,7 @@ namespace lotus::core::connection
 
     std::unique_ptr<TCPServerSideConnection>
         TCPServerSideConnection::accept(
-            void* tcp_server_handle) noexcept
+            void* tcp_server_handle) 
     {
         auto tcp_svr = static_cast<uvw::TCPHandle*>(
             tcp_server_handle);
@@ -114,7 +114,7 @@ namespace lotus::core::connection
         }
     }
 
-    void TCPServerSideConnection::close() noexcept
+    void TCPServerSideConnection::close() 
     {
         const auto& tcp =
             std::static_pointer_cast<uvw::TCPHandle>(

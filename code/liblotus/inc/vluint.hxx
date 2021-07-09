@@ -22,23 +22,23 @@ namespace lotus::core::variant_length
         };
 
     public:
-        vluint() noexcept;
-        vluint(std::uint32_t val) noexcept;
-        vluint(const vluint& rhs) noexcept;
-        vluint(vluint&& rhs) noexcept;
-        vluint& operator=(const vluint& rhs) noexcept;
-        vluint& operator=(vluint&& rhs) noexcept;
-        ~vluint() noexcept;
+        vluint() ;
+        vluint(std::uint32_t val) ;
+        vluint(const vluint& rhs) ;
+        vluint(vluint&& rhs) ;
+        vluint& operator=(const vluint& rhs) ;
+        vluint& operator=(vluint&& rhs) ;
+        ~vluint() ;
 
     public:
-        std::uint32_t value() const noexcept;
-        int decoded_size() const noexcept;
+        std::uint32_t value() const ;
+        int decoded_size() const ;
         
-        void value(std::uint32_t val) noexcept;
+        void value(std::uint32_t val) ;
 
-        digest_state_e digest(const std::uint8_t& byte) noexcept;
-        int encoded_size() const noexcept;
-        const std::uint8_t* encoded_data() const noexcept;
+        digest_state_e digest(const std::uint8_t& byte) ;
+        int encoded_size() const ;
+        const std::uint8_t* encoded_data() const ;
 
     private:
         std::array<std::uint8_t, 6> _data;

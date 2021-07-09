@@ -14,17 +14,17 @@ namespace lotus::core
     class STALoop
     {
     protected:
-        STALoop() noexcept;
+        STALoop() ;
 
     private:
-        STALoop(std::unique_ptr<STALoop>&& impl) noexcept;
+        STALoop(std::unique_ptr<STALoop>&& impl) ;
 
     public:
-        static STALoop* create() noexcept;
-        virtual ~STALoop() noexcept;
+        static STALoop* create() ;
+        virtual ~STALoop() ;
 
     public:
-        virtual void run() noexcept;
+        virtual void run() ;
 
     public:
         std::unique_ptr<STALoop>  _impl;

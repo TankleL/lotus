@@ -13,18 +13,18 @@ namespace lotus::core::connection
         public IServerSideConnection
     {
     private:
-        TCPServerSideConnection() noexcept;
+        TCPServerSideConnection() ;
 
     public:
         ~TCPServerSideConnection();
 
         void read() override;
         size_t write(const char* data, size_t length) override;
-        void close() noexcept;
+        void close() ;
 
     public:
         static std::unique_ptr<TCPServerSideConnection>
-            accept(void* tcp_server_handle) noexcept;
+            accept(void* tcp_server_handle) ;
 
     private:
         std::shared_ptr<void> _tcp_client_handle;
@@ -43,7 +43,7 @@ namespace lotus::core::connection
         TCPConnectionListener(STALoop* loop);
 
     public:
-        void listen(const std::string& connstr) noexcept;
+        void listen(const std::string& connstr) ;
 
     private:
         STALoop* _loop;

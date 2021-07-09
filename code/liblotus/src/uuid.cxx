@@ -16,7 +16,7 @@ namespace lotus::core
         : _data(id._data)
     {}
 
-    UUID::UUID(UUID&& id) noexcept
+    UUID::UUID(UUID&& id) 
         : _data(std::move(id._data))
     {}
 
@@ -115,18 +115,18 @@ namespace lotus::core
         return *this;
     }
 
-    UUID& UUID::operator=(UUID&& rhs) noexcept
+    UUID& UUID::operator=(UUID&& rhs) 
     {
         _data = std::move(rhs._data);
         return *this;
     }
 
-    bool UUID::operator==(const UUID& rhs) const noexcept
+    bool UUID::operator==(const UUID& rhs) const 
     {
         return _data == _data;
     }
 
-    bool UUID::operator!=(const UUID& rhs) const noexcept
+    bool UUID::operator!=(const UUID& rhs) const 
     {
         return !(*this == rhs);
     }

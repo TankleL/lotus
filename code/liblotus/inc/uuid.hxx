@@ -18,7 +18,7 @@ namespace lotus::core
     public:
         UUID();
         UUID(const UUID& id);
-        UUID(UUID&& id) noexcept;
+        UUID(UUID&& id) ;
         UUID(const data_t& data);
         UUID(data_t&& data);
         ~UUID();
@@ -31,9 +31,9 @@ namespace lotus::core
         unsigned int hash_code() const;
 
         UUID& operator=(const UUID& rhs);
-        UUID& operator=(UUID&& rhs) noexcept;
-        bool operator==(const UUID& rhs) const noexcept;
-        bool operator!=(const UUID& rhs) const noexcept;
+        UUID& operator=(UUID&& rhs) ;
+        bool operator==(const UUID& rhs) const ;
+        bool operator!=(const UUID& rhs) const ;
         uint8_t& operator[](int idx);
 
     private:

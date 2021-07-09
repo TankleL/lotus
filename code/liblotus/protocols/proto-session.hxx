@@ -24,7 +24,7 @@ namespace lotus::core::protocols::proto_session
         uint32_t session_id;
         std::vector<char> payload;
 
-        SessionReq(ProtocolRequest<ProtocolBase>&& base) noexcept
+        SessionReq(ProtocolRequest<ProtocolBase>&& base) 
             : ProtocolRequest<ProtocolBase>(std::move(base))
             , intention(Intention::bad_intention)
             , session_id(0)
@@ -32,7 +32,7 @@ namespace lotus::core::protocols::proto_session
             request_id = REQ_ID;
         }
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             pac.pack_int32(static_cast<int32_t>(intention));
             pac.pack_uint32(session_id);
@@ -60,12 +60,12 @@ namespace lotus::core::protocols::proto_session
     struct SessionReq<ZeroBased> final
         : public SessionReq<ProtocolRequest<ProtocolBase>>
     {
-        SessionReq() noexcept
+        SessionReq() 
             : SessionReq<ProtocolRequest<ProtocolBase>>(
                 ProtocolRequest<ZeroBased>())
         {}
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             ProtocolBase::on_packing(pac);
             SessionReq<ProtocolRequest<ProtocolBase>>
@@ -96,14 +96,14 @@ namespace lotus::core::protocols::proto_session
         static constexpr int RSP_ID = 0x00000101;
         uint32_t session_id;
         
-        SessionRsp(ProtocolResponse<ProtocolBase>&& base) noexcept
+        SessionRsp(ProtocolResponse<ProtocolBase>&& base) 
             : ProtocolResponse<ProtocolBase>(std::move(base))
             , session_id(0)
         {
             response_id = RSP_ID;
         }
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             pac.pack_uint32(session_id);
         }
@@ -128,12 +128,12 @@ namespace lotus::core::protocols::proto_session
     struct SessionRsp<ZeroBased> final
         : public SessionRsp<ProtocolResponse<ProtocolBase>>
     {
-        SessionRsp() noexcept
+        SessionRsp() 
             : SessionRsp<ProtocolResponse<ProtocolBase>>(
                 ProtocolResponse<ZeroBased>())
         {}
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             ProtocolBase::on_packing(pac);
             SessionRsp<ProtocolResponse<ProtocolBase>>

@@ -4,13 +4,13 @@ namespace lotus::core
 {
     void Attachable::attach(
         int index,
-        std::unique_ptr<IAttachment>&& attachment) noexcept
+        std::unique_ptr<IAttachment>&& attachment) 
     {
         //_attachments[index] = std::move(attachment);
         _attachments.emplace(std::make_pair(index, std::move(attachment)));
     }
 
-    IAttachment* Attachable::attachment(int index) noexcept
+    IAttachment* Attachable::attachment(int index) 
     {
         const auto& found = _attachments.find(index);
         if (found != _attachments.cend())
@@ -23,12 +23,12 @@ namespace lotus::core
         }
     }
 
-    void Attachable::detach(int index) noexcept
+    void Attachable::detach(int index) 
     {
         _attachments.erase(index);
     }
 
-    void Attachable::clear() noexcept
+    void Attachable::clear() 
     {
         _attachments.clear();
     }

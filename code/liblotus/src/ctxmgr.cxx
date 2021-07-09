@@ -2,12 +2,12 @@
 
 namespace lotus::core
 {
-    ContextManager::ContextManager() noexcept
+    ContextManager::ContextManager() 
         : _last_id(0)
         , _conn(nullptr)
     {}
 
-    ContextManager& ContextManager::bind(IConnection& conn) noexcept
+    ContextManager& ContextManager::bind(IConnection& conn) 
     {
         auto instance = std::make_unique<ContextManager>();
         auto& retval = *instance;
@@ -17,7 +17,7 @@ namespace lotus::core
     }
 
     Context& ContextManager::push(
-        std::unique_ptr<Context>&& ctx) noexcept
+        std::unique_ptr<Context>&& ctx) 
     {
         auto& retval = *ctx;
         ctx->id = ++_last_id;
@@ -26,7 +26,7 @@ namespace lotus::core
     }
 
     std::unique_ptr<Context> ContextManager::pop(
-        uint32_t id) noexcept
+        uint32_t id) 
     {
         const auto& it = _ctxmap.find(id);
         if (it != _ctxmap.end())

@@ -13,16 +13,16 @@ namespace lotus::core::_internal
         static const std::string not_seg_val;
 
     public:
-        ConnString(const std::string& connstr) noexcept;
+        ConnString(const std::string& connstr) ;
 
-        std::string host() const noexcept;
-        uint16_t port() const noexcept;
-        int backlogs() const noexcept;
+        std::string host() const ;
+        uint16_t port() const ;
+        int backlogs() const ;
 
-        std::string segment(const std::string& name) const noexcept;
+        std::string segment(const std::string& name) const ;
 
     private:
-        void _filter_common_segements() noexcept;
+        void _filter_common_segements() ;
         
     private:
         std::map<std::string, std::string> _segments;

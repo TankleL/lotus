@@ -61,7 +61,7 @@ namespace lotus::core::connection
         _tcp_handle = tcp;
     }
 
-    void TCPClientSideConnection::disconnect() noexcept
+    void TCPClientSideConnection::disconnect() 
     {
         if(_is_connected)
         {

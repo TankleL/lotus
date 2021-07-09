@@ -2,28 +2,28 @@
 
 namespace lotus::core::variant_length
 {
-    vlint::vlint() noexcept
+    vlint::vlint() 
     {}
 
-    vlint::vlint(std::int32_t val) noexcept
+    vlint::vlint(std::int32_t val) 
         : vluint(_zz_map(val))
     {}
 
-    vlint::vlint(const vlint& rhs) noexcept
+    vlint::vlint(const vlint& rhs) 
         : vluint(rhs)
     {}
 
-    vlint::vlint(vlint&& rhs) noexcept
+    vlint::vlint(vlint&& rhs) 
         : vluint(std::move(rhs))
     {}
 
-    vlint& vlint::operator=(const vlint& rhs) noexcept
+    vlint& vlint::operator=(const vlint& rhs) 
     {
         vluint::operator=(rhs);
         return *this;
     }
 
-    vlint& vlint::operator=(vlint&& rhs) noexcept
+    vlint& vlint::operator=(vlint&& rhs) 
     {
         vluint::operator=(std::move(rhs));
         return *this;
@@ -32,43 +32,43 @@ namespace lotus::core::variant_length
     vlint::~vlint()
     {}
 
-    std::int32_t vlint::value() const noexcept
+    std::int32_t vlint::value() const 
     {
         return _zz_unmap(vluint::value());
     }
 
-    int vlint::decoded_size() const noexcept
+    int vlint::decoded_size() const 
     {
         return vluint::decoded_size();
     }
 
-    void vlint::value(std::int32_t val) noexcept
+    void vlint::value(std::int32_t val) 
     {
         vluint::value(_zz_map(val));
     }
 
     vlint::digest_state_e
-    vlint::digest(const std::uint8_t& byte) noexcept
+    vlint::digest(const std::uint8_t& byte) 
     {
         return vluint::digest(byte);
     }
 
-    int vlint::encoded_size() const noexcept
+    int vlint::encoded_size() const 
     {
         return vluint::encoded_size();
     }
 
-    const std::uint8_t* vlint::encoded_data() const noexcept
+    const std::uint8_t* vlint::encoded_data() const 
     {
         return vluint::encoded_data();
     }
 
-    std::uint32_t vlint::_zz_map(std::int32_t n) noexcept
+    std::uint32_t vlint::_zz_map(std::int32_t n) 
     {
         return (n << 1) ^ (n >> 31);
     }
 
-    std::int32_t vlint::_zz_unmap(std::uint32_t n) noexcept
+    std::int32_t vlint::_zz_unmap(std::uint32_t n) 
     {
         return (n >> 1) ^ -static_cast<int32_t>(n & 1);
     }

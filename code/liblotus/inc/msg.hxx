@@ -37,12 +37,12 @@ namespace lotus::core
     public:
         Message();
         Message(const Message& rhs);
-        Message(Message&& rhs) noexcept;
+        Message(Message&& rhs) ;
 
     public:
         void acquire(Message& rhs);
         Message& operator=(const Message& rhs);
-        Message& operator=(Message&& rhs) noexcept;
+        Message& operator=(Message&& rhs) ;
 
     public:
         UUID        session_id;

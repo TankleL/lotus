@@ -20,19 +20,19 @@ namespace lotus::core::protocols
         static constexpr size_t FIXED_HEADER_LENGTH = 2;
 
     public:
-        PackedPackage() noexcept;
+        PackedPackage() ;
         PackedPackage(const PackedPackage&) = delete;
-        PackedPackage(PackedPackage&& rhs) noexcept;
-        ~PackedPackage() noexcept;
+        PackedPackage(PackedPackage&& rhs) ;
+        ~PackedPackage() ;
 
         PackedPackage& operator=(const PackedPackage&) = delete;
-        PackedPackage& operator=(PackedPackage&& rhs) noexcept;
+        PackedPackage& operator=(PackedPackage&& rhs) ;
 
     public:
-        void* native_stream() const noexcept;
-        void refresh_header() noexcept;
-        const char* data() const noexcept;
-        size_t length() const noexcept;
+        void* native_stream() const ;
+        void refresh_header() ;
+        const char* data() const ;
+        size_t length() const ;
         
     private:
         void* _native_stream;
@@ -41,13 +41,13 @@ namespace lotus::core::protocols
     class Packer final
     {
     public:
-        Packer() noexcept;
+        Packer() ;
         Packer(const Packer&) = delete;
-        Packer(Packer&& rhs) noexcept;
-        ~Packer() noexcept;
+        Packer(Packer&& rhs) ;
+        ~Packer() ;
 
         Packer& operator=(const Packer&) = delete;
-        Packer& operator=(Packer&& rhs) noexcept;
+        Packer& operator=(Packer&& rhs) ;
 
     public:
         PackedPackage& result();
@@ -63,19 +63,19 @@ namespace lotus::core::protocols
     class Unpacker final
     {
     public:
-        Unpacker() noexcept;
-        Unpacker(const char* data, size_t length) noexcept;
+        Unpacker() ;
+        Unpacker(const char* data, size_t length) ;
         Unpacker(const Unpacker&) = delete;
-        Unpacker(Unpacker&& rhs) noexcept;
-        ~Unpacker() noexcept;
+        Unpacker(Unpacker&& rhs) ;
+        ~Unpacker() ;
 
         Unpacker& operator=(const Unpacker&) = delete;
-        Unpacker& operator=(Unpacker&& rhs) noexcept;
+        Unpacker& operator=(Unpacker&& rhs) ;
 
     public:
-        void set_data(const char* data, size_t length) noexcept;
-        bool next() noexcept;
-        size_t parsed_size() const noexcept;
+        void set_data(const char* data, size_t length) ;
+        bool next() ;
+        size_t parsed_size() const ;
 
         int32_t to_int32() const;
         uint32_t to_uint32() const;
@@ -100,17 +100,17 @@ namespace lotus::core::protocols
             notification = 3
         } proto_type;
 
-        ProtocolBase() noexcept;
+        ProtocolBase() ;
         ProtocolBase(const ProtocolBase&) = delete;
-        ProtocolBase(ProtocolBase&& rhs) noexcept;
+        ProtocolBase(ProtocolBase&& rhs) ;
         ProtocolBase& operator=(const ProtocolBase&) = delete;
-        ProtocolBase& operator=(ProtocolBase&& rhs) noexcept;
+        ProtocolBase& operator=(ProtocolBase&& rhs) ;
 
-        PackedPackage pack() noexcept;
+        PackedPackage pack() ;
         size_t unpack(const char* data, size_t length);
 
-        virtual ~ProtocolBase() noexcept {};
-        virtual void on_packing(Packer& pac) noexcept;
+        virtual ~ProtocolBase()  {};
+        virtual void on_packing(Packer& pac) ;
         virtual size_t on_unpacking(Unpacker& pac);
     };
 
@@ -125,13 +125,13 @@ namespace lotus::core::protocols
         uint32_t request_id;
         uint32_t ctx_id;
 
-        ProtocolRequest(ProtocolBase&& base) noexcept
+        ProtocolRequest(ProtocolBase&& base) 
             : ProtocolBase(std::move(base))
             , request_id(0)
             , ctx_id(0)
         {}
 
-        virtual ~ProtocolRequest() noexcept
+        virtual ~ProtocolRequest() 
         {}
 
         ProtocolRequest(const ProtocolRequest&) = default;
@@ -139,7 +139,7 @@ namespace lotus::core::protocols
         ProtocolRequest& operator=(const ProtocolRequest&) = default;
         ProtocolRequest& operator=(ProtocolRequest&&) = default;
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             pac.pack_uint32(request_id);
             pac.pack_uint32(ctx_id);
@@ -163,13 +163,13 @@ namespace lotus::core::protocols
     struct ProtocolRequest<ZeroBased>
         : public ProtocolRequest<ProtocolBase>
     {
-        ProtocolRequest() noexcept
+        ProtocolRequest() 
             : ProtocolRequest<ProtocolBase>(ProtocolBase())
         {
             proto_type = ProtocolType::request;
         }
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             ProtocolBase::on_packing(pac);
             ProtocolRequest<ProtocolBase>::on_packing(pac);
@@ -192,14 +192,14 @@ namespace lotus::core::protocols
         int32_t result_code;
         uint32_t ctx_id;
 
-        ProtocolResponse(ProtocolBase&& base) noexcept
+        ProtocolResponse(ProtocolBase&& base) 
             : ProtocolBase(std::move(base))
             , response_id(0)
             , result_code(0)
             , ctx_id(0)
         {}
 
-        virtual ~ProtocolResponse() noexcept
+        virtual ~ProtocolResponse() 
         {}
 
         ProtocolResponse(const ProtocolResponse&) = default;
@@ -207,7 +207,7 @@ namespace lotus::core::protocols
         ProtocolResponse& operator=(const ProtocolResponse&) = default;
         ProtocolResponse& operator=(ProtocolResponse&&) = default;
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             pac.pack_uint32(response_id);
             pac.pack_int32(result_code);
@@ -236,13 +236,13 @@ namespace lotus::core::protocols
     struct ProtocolResponse<ZeroBased>
         : public ProtocolResponse<ProtocolBase>
     {
-        ProtocolResponse() noexcept
+        ProtocolResponse() 
             : ProtocolResponse<ProtocolBase>(ProtocolBase())
         {
             proto_type = ProtocolType::response;
         }
 
-        virtual void on_packing(Packer& pac) noexcept override
+        virtual void on_packing(Packer& pac)  override
         {
             ProtocolBase::on_packing(pac);
             ProtocolResponse<ProtocolBase>::on_packing(pac);

@@ -13,15 +13,15 @@ namespace lotus::core
         SessionManager::begin_session_cb beg_cb;
     };
 
-    SessionManager::SessionManager() noexcept
+    SessionManager::SessionManager() 
         : _conn(nullptr)
         , _last_sid(0)
     {}
 
-    SessionManager::~SessionManager() noexcept
+    SessionManager::~SessionManager() 
     {}
 
-    SessionManager& SessionManager::bind(IConnection& conn) noexcept
+    SessionManager& SessionManager::bind(IConnection& conn) 
     {
         auto instance = std::make_unique<SessionManager>();
         auto& retval = *instance;
@@ -31,7 +31,7 @@ namespace lotus::core
     }
 
     void SessionManager::associate_with(
-        protocols::ProtoListener& listener) noexcept
+        protocols::ProtoListener& listener) 
     {
         listener.add_request_callback(
             pts::SessionReq<pt::ZeroBased>::REQ_ID,

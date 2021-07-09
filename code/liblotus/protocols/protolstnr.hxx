@@ -13,21 +13,21 @@ namespace lotus::core::protocols
     class ListenedPackage final
     {
     public:
-        ListenedPackage() noexcept;
-        explicit ListenedPackage(size_t size) noexcept;
+        ListenedPackage() ;
+        explicit ListenedPackage(size_t size) ;
         ListenedPackage(const ListenedPackage&) = delete;
-        ListenedPackage(ListenedPackage&&) noexcept;
-        ~ListenedPackage() noexcept;
+        ListenedPackage(ListenedPackage&&) ;
+        ~ListenedPackage() ;
 
         ListenedPackage& operator=(const ListenedPackage&) = delete;
-        ListenedPackage& operator=(ListenedPackage&& rhs) noexcept;
+        ListenedPackage& operator=(ListenedPackage&& rhs) ;
 
     public:
-        char* data() const noexcept;
-        size_t size() const noexcept;
-        ListenedPackage& acquire(ListenedPackage& src) noexcept;
-        bool is_available() const noexcept;
-        ListenedPackage& redefine(size_t size) noexcept;
+        char* data() const ;
+        size_t size() const ;
+        ListenedPackage& acquire(ListenedPackage& src) ;
+        bool is_available() const ;
+        ListenedPackage& redefine(size_t size) ;
 
     private:
         char* _buf;
@@ -49,30 +49,30 @@ namespace lotus::core::protocols
         typedef std::function<bool(void)> unknown_callback_t;
 
     public:
-        ProtoListener() noexcept;
+        ProtoListener() ;
         ProtoListener(const ProtoListener&) = delete;
         ProtoListener(ProtoListener&&) = default;
-        virtual ~ProtoListener() noexcept;
+        virtual ~ProtoListener() ;
 
         ProtoListener& operator=(const ProtoListener&) = delete;
         ProtoListener& operator=(ProtoListener&&) = default;
 
     public:
-        static ProtoListener& bind(IConnection& conn) noexcept;
-        bool parse(const char* data, size_t length) noexcept;
+        static ProtoListener& bind(IConnection& conn) ;
+        bool parse(const char* data, size_t length) ;
         void add_request_callback(
             uint32_t req_id,
-            const req_callback_t& cb) noexcept;
+            const req_callback_t& cb) ;
         void add_response_callback(
             uint32_t rsp_id,
-            const rsp_callback_t& cb) noexcept;
+            const rsp_callback_t& cb) ;
 
     private:
-        void _ensure_pack() noexcept;
+        void _ensure_pack() ;
         bool _parse_single_pack(
             const char* data,
-            size_t length) noexcept;
-        bool _dispatch(ListenedPackage&& pack) noexcept;
+            size_t length) ;
+        bool _dispatch(ListenedPackage&& pack) ;
         
     private:
         IConnection* _conn;

@@ -13,28 +13,28 @@ namespace lotus::core
     {
         uint32_t id;
 
-        Context() noexcept : id(0) {}
+        Context()  : id(0) {}
         virtual ~Context() {}
     };
 
     class ContextManager final : public IAttachment
     {
     public:
-        ContextManager() noexcept;
+        ContextManager() ;
 
     public:
-        static ContextManager& bind(IConnection& conn) noexcept;
-        Context& push(std::unique_ptr<Context>&& ctx) noexcept;
-        std::unique_ptr<Context> pop(uint32_t id) noexcept;
+        static ContextManager& bind(IConnection& conn) ;
+        Context& push(std::unique_ptr<Context>&& ctx) ;
+        std::unique_ptr<Context> pop(uint32_t id) ;
 
         template <typename TCtx>
-        TCtx& push_t(std::unique_ptr<TCtx>&& ctx) noexcept
+        TCtx& push_t(std::unique_ptr<TCtx>&& ctx) 
         {
             return static_cast<TCtx&>(push(std::move(ctx)));
         }
 
         template <typename TCtx>
-        std::unique_ptr<TCtx> pop_t(uint32_t id) noexcept
+        std::unique_ptr<TCtx> pop_t(uint32_t id) 
         {
             return std::unique_ptr<TCtx>(
                 static_cast<TCtx*>(pop(id).release()));

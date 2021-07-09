@@ -9,13 +9,13 @@ namespace lotus::core::_internal
     class STALoopImpl : public STALoop
     {
     public:
-        STALoopImpl() noexcept;
+        STALoopImpl() ;
 
     public:
-        void run() noexcept override;
+        void run()  override;
 
     public:
-        uvw::Loop* _native_loop() noexcept;
+        uvw::Loop* _native_loop() ;
 
     private:
         std::shared_ptr<uvw::Loop> _loop;

@@ -11,7 +11,7 @@ namespace lotus::core
     class IAttachment
     {
     public:
-        virtual ~IAttachment() noexcept {}
+        virtual ~IAttachment()  {}
     };
 
     class Attachable
@@ -19,14 +19,14 @@ namespace lotus::core
     public:
         void attach(
             int index,
-            std::unique_ptr<IAttachment>&& attachment) noexcept;
-        IAttachment* attachment(int index) noexcept;
-        void detach(int index) noexcept;
-        void clear() noexcept;
+            std::unique_ptr<IAttachment>&& attachment) ;
+        IAttachment* attachment(int index) ;
+        void detach(int index) ;
+        void clear() ;
 
     public:
         template<typename ValType>
-        constexpr ValType* attachment(int index) noexcept
+        constexpr ValType* attachment(int index) 
         {
             IAttachment* att = attachment(index);
             if (att != nullptr)
