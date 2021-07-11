@@ -17,9 +17,9 @@ int main(int argc, char** argv)
         {
             smgr->begin_session([idx=i](auto rescode, auto session)
             {
-                //std::cout << idx << "--------------------------------------" << std::endl;
-                //std::cout << "result_code = " << rescode << std::endl;
-                //std::cout << "session_id = " << session->get_id() << std::endl;
+                std::cout << idx << "--------------------------------------" << std::endl;
+                std::cout << "result_code = " << rescode << std::endl;
+                std::cout << "session_id = " << session->get_id() << std::endl;
             });
         }
     });

@@ -218,7 +218,7 @@ namespace lotus::core::protocols
         assert(length <= _tmp_pack_size &&
             _tmp_pack_read + length <= _tmp_pack_size);
 
-        memcpy(_tmp_pack.data(), data, length);
+        memcpy(_tmp_pack.data() + _tmp_pack_read, data, length);
         _tmp_pack_read += length;
 
         if (_tmp_pack_read == _tmp_pack_size)
@@ -227,7 +227,14 @@ namespace lotus::core::protocols
             pack.acquire(_tmp_pack);
             return _dispatch(std::move(pack));
         }
-        return true;
+        else if (_tmp_pack_read > _tmp_pack_size)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     bool ProtoListener::_dispatch(ListenedPackage&& pack) 
