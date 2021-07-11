@@ -62,6 +62,8 @@ namespace lotus::core::connection
             new TCPServerSideConnection());
 
         auto client = tcp_svr->loop().resource<uvw::TCPHandle>();
+
+        // date event
         client->on<uvw::DataEvent>([connection = conn.get()]
         (const uvw::DataEvent& de, uvw::TCPHandle& tcp) {
             bool close_conn = false;
@@ -81,10 +83,38 @@ namespace lotus::core::connection
                 connection->close();
         });
 
+        // end event
         client->on<uvw::EndEvent>(
             [](const auto& ee, auto& client)
         {
             client.read();
+        });
+
+        // error event
+        client->on<uvw::ErrorEvent>(
+            [connection = conn.get()](const uvw::ErrorEvent& ee, uvw::TCPHandle& tcp)
+        {
+            if(connection->on_error != nullptr)
+            {
+                connection->on_error(*connection, ee.code(), ee.name());
+            }
+        });
+
+        // close event
+        client->on<uvw::CloseEvent>(
+            [connection = conn.get()]
+        (const uvw::CloseEvent& ce, uvw::TCPHandle& tcp)
+        {
+            if (connection->on_closed != nullptr)
+            {
+                connection->on_closed(*connection);
+            }
+        });
+
+        client->on<uvw::ShutdownEvent>([](const auto& se, auto& tcp)
+        {
+            static int count = 0;
+            ++count;
         });
 
         conn->_tcp_client_handle = client;
@@ -120,7 +150,7 @@ namespace lotus::core::connection
             std::static_pointer_cast<uvw::TCPHandle>(
                 _tcp_client_handle);
 
-        if(tcp != nullptr && tcp->active())
+        if(tcp != nullptr)
             tcp->close();
     }
 } // namespace lotus::core::connection

@@ -75,6 +75,10 @@ namespace lotus::core::connection
         {
             _is_connected = false;
             // TODO:
+            auto tcp =
+                std::static_pointer_cast<uvw::TCPHandle>(_tcp_handle);
+            tcp->shutdown();
+            _tcp_handle = nullptr;
         }
     }
 

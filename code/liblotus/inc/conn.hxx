@@ -25,8 +25,18 @@ namespace lotus::core
         read_callback_t on_read;
 
         // error callback
-        typedef std::function<void(void)> error_callback_t;
+        typedef std::function<
+            void(
+                IConnection& conn,
+                int error_code,
+                const char* error_name)> error_callback_t;
         error_callback_t on_error;
+
+        // closed callback
+        typedef std::function<
+            void(
+                IConnection& conn)> closed_callback_t;
+        closed_callback_t on_closed;
 
     public:
         virtual ~IConnection() {}
