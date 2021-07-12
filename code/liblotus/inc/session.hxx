@@ -19,26 +19,25 @@ namespace lotus::core
         using session_req_t =
             protocols::proto_session::SessionReq<
             protocols::ZeroBased>;
-        typedef std::function<void()> recv_callback_t;
+        typedef std::function<
+            void(
+                const char* data,
+                size_t length)> recv_callback_t;
+        recv_callback_t on_data_recv;
 
     public:
         Session() = delete;
-        Session(IConnection* conn) ;
-        Session(uint32_t id, IConnection* conn) ;
+        Session(IConnection* conn);
+        Session(uint32_t id, IConnection* conn);
 
     public:
-        void on_msg_sent();
-        void on_msg_received();
-        void on_error();
+        void send_msg(const char* data, size_t length);
+        void send_msg(std::vector<char>&& data);
 
-        void send_msg(const char* data, size_t length) ;
-        void send_msg(std::vector<char>&& data) ;
-
-        uint32_t get_id() const ;
+        uint32_t get_id() const;
 
     private:
-        void _send_req(session_req_t& req)
-            ;
+        void _send_req(session_req_t& req);
 
     private:
         uint32_t _id;

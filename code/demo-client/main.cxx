@@ -1,7 +1,8 @@
 #include <iostream>
 #include <lotus.hxx>
 
-constexpr int MAX_REPEATING = 10000;
+constexpr int MAX_REPEATING = 10;
+const std::string MSG_HELLO("Hello, lotus!");
 
 int main(int argc, char** argv)
 {
@@ -16,11 +17,16 @@ int main(int argc, char** argv)
         auto* smgr = conn->attachment<SessionManager>(conn->ATTID_SessionManager);
         for (int i = 0; i < MAX_REPEATING; ++i)
         {
-            smgr->begin_session([conn, idx=i](auto rescode, auto session)
+            smgr->begin_session([conn, idx=i](int32_t rescode, Session* session)
             {
                 //std::cout << idx << "--------------------------------------" << std::endl;
                 //std::cout << "result_code = " << rescode << std::endl;
                 //std::cout << "session_id = " << session->get_id() << std::endl;
+
+                if (session)
+                {
+                    session->send_msg(MSG_HELLO.data(), MSG_HELLO.length());
+                }
 
                 if (idx == MAX_REPEATING - 1)
                 {

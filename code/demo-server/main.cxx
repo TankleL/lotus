@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 #include <unordered_map>
 #include <lotus.hxx>
 
@@ -30,6 +31,15 @@ int main(int argc, char** argv)
             {
                 conn_map.erase(it);
             }
+        };
+
+        auto* smgr = conn->attachment<SessionManager>(conn->ATTID_SessionManager);
+        smgr->on_new_session = [](Session& session)
+        {
+            session.on_data_recv = [](const char* data, size_t length)
+            {
+                std::cout << std::string(data, data + length) << std::endl;
+            };
         };
 
         conn_map[(size_t)conn.get()] = std::move(conn);

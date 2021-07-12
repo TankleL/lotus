@@ -25,6 +25,7 @@ namespace lotus::core
             length <= std::numeric_limits<uint32_t>::max());
 
         pts::SessionReq<pt::ZeroBased> req;
+        req.session_id = _id;
         req.intention =
             pts::SessionReq<pt::ZeroBased>::Intention::session_data;
         req.payload.resize(length);
@@ -40,6 +41,7 @@ namespace lotus::core
             data.size() <= std::numeric_limits<uint32_t>::max());
 
         pts::SessionReq<pt::ZeroBased> req;
+        req.session_id = _id;
         req.intention =
             pts::SessionReq<pt::ZeroBased>::Intention::session_data;
         req.payload = std::move(data);
@@ -55,7 +57,6 @@ namespace lotus::core
     void Session::_send_req(session_req_t& req) 
     {
         assert(_conn != nullptr);
-
         auto package = req.pack();
         _conn->write(package.data(), package.length());
     }

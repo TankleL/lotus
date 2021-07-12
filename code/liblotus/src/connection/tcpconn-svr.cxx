@@ -85,9 +85,10 @@ namespace lotus::core::connection
 
         // end event
         client->on<uvw::EndEvent>(
-            [](const auto& ee, auto& client)
+            [](const auto& ee, uvw::TCPHandle& client)
         {
-            client.read();
+            if(client.readable())
+                client.read();
         });
 
         // error event

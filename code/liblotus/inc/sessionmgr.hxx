@@ -21,7 +21,11 @@ namespace lotus::core
                 Session* session)>;
         using end_session_cb =
             std::function<void(int32_t result_code)>;
-        using new_session_cb = std::function<void(void)>;
+        using new_session_cb =
+            std::function<void(Session& session)>;
+
+    public:
+        new_session_cb on_new_session;
 
     public:
         SessionManager() ;
@@ -34,8 +38,6 @@ namespace lotus::core
 
         void begin_session(const begin_session_cb& callback) ;
         void end_session(const end_session_cb& callback);
-        void on_new_session() ;
-        void on_kill_session() ;
 
     private:
         bool _handle_session_req(

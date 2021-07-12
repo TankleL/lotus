@@ -110,6 +110,10 @@ namespace lotus::core
         {
             auto sid = ++_last_sid;
             auto sess = std::make_unique<Session>(sid, _conn);
+            if (on_new_session != nullptr)
+            {
+                on_new_session(*sess);
+            }
             _sessmap.emplace(sid, std::move(sess));
 
             pts::SessionRsp<pt::ZeroBased> rsp;
@@ -133,7 +137,22 @@ namespace lotus::core
             protocols::ProtocolRequest<
             protocols::ProtocolBase>>& req)
     {
-        return true;
+        const auto& sess_it = _sessmap.find(req.session_id);
+        if (sess_it != _sessmap.cend())
+        {
+            auto& sess = sess_it->second;
+            if (sess->on_data_recv != nullptr)
+            {
+                sess->on_data_recv(
+                    req.payload.data(),
+                    req.payload.size());
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     bool SessionManager::_handle_session_rsp(
